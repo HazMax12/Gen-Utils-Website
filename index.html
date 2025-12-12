@@ -1,0 +1,369 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Gen Utils — Professional Discord Management</title>
+  <meta name="description" content="Gen Utils is a licensed, professional Discord bot for staff management, applications, promotions, strikes, and server automation." />
+
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+  <style>
+    :root {
+      --bg: #ffffff;
+      --bg-soft: #f6f6f6;
+      --border: rgba(0,0,0,0.08);
+      --text: #0a0a0a;
+      --muted: #5f6368;
+      --accent: #000000;
+      --radius: 18px;
+      --shadow: 0 20px 50px rgba(0,0,0,0.08);
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.6;
+      -webkit-font-smoothing: antialiased;
+      padding: 64px 20px;
+    }
+
+    .page {
+      max-width: 1200px;
+      margin: 0 auto;
+      display: grid;
+      gap: 96px;
+    }
+
+    /* HERO */
+    .hero {
+      display: grid;
+      grid-template-columns: 1.1fr 0.9fr;
+      gap: 48px;
+      align-items: center;
+      animation: fadeUp 0.9s ease forwards;
+    }
+
+    .hero h1 {
+      font-size: clamp(2.4rem, 4.5vw, 3.4rem);
+      font-weight: 800;
+      letter-spacing: -0.03em;
+      line-height: 1.15;
+    }
+
+    .hero p {
+      margin-top: 20px;
+      font-size: 1.05rem;
+      color: var(--muted);
+      max-width: 560px;
+    }
+
+    .hero-actions {
+      margin-top: 32px;
+      display: flex;
+      gap: 14px;
+      flex-wrap: wrap;
+    }
+
+    .btn {
+      padding: 14px 22px;
+      border-radius: 999px;
+      font-weight: 700;
+      text-decoration: none;
+      border: 1px solid var(--accent);
+      color: var(--accent);
+      background: transparent;
+      transition: transform .2s ease, box-shadow .2s ease, background .2s ease;
+    }
+
+    .btn-primary {
+      background: var(--accent);
+      color: #fff;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+    }
+
+    .btn:hover { transform: translateY(-2px); }
+
+    .hero-card {
+      background: linear-gradient(180deg, #fff, var(--bg-soft));
+      border-radius: var(--radius);
+      padding: 36px;
+      border: 1px solid var(--border);
+      box-shadow: var(--shadow);
+    }
+
+    .hero-card h3 {
+      font-size: 1.2rem;
+      margin-bottom: 12px;
+    }
+
+    .hero-card ul {
+      list-style: none;
+      display: grid;
+      gap: 12px;
+      color: var(--muted);
+      font-size: 0.95rem;
+    }
+
+    /* SECTION */
+    section {
+      display: grid;
+      gap: 48px;
+    }
+
+    .section-header {
+      max-width: 640px;
+    }
+
+    .section-header h2 {
+      font-size: clamp(1.9rem, 3vw, 2.4rem);
+      font-weight: 800;
+      letter-spacing: -0.02em;
+    }
+
+    .section-header p {
+      margin-top: 16px;
+      color: var(--muted);
+      font-size: 1.02rem;
+    }
+
+    /* FEATURES */
+    .features {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 28px;
+    }
+
+    .feature {
+      padding: 28px;
+      border-radius: var(--radius);
+      background: var(--bg-soft);
+      border: 1px solid var(--border);
+      transition: transform .25s ease, box-shadow .25s ease;
+    }
+
+    .feature:hover {
+      transform: translateY(-6px);
+      box-shadow: var(--shadow);
+    }
+
+    .feature h3 {
+      font-size: 1.1rem;
+      margin-bottom: 10px;
+    }
+
+    .feature p {
+      color: var(--muted);
+      font-size: 0.95rem;
+    }
+
+    /* FLOW */
+    .flow {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 32px;
+    }
+
+    .step {
+      padding: 30px;
+      border-radius: var(--radius);
+      border: 1px solid var(--border);
+      background: #fff;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+
+    .step span {
+      font-weight: 800;
+      font-size: 0.75rem;
+      letter-spacing: 0.12em;
+      color: var(--muted);
+    }
+
+    .step h4 {
+      font-size: 1.15rem;
+    }
+
+    .step p {
+      color: var(--muted);
+      font-size: 0.95rem;
+      line-height: 1.55;
+    }
+
+    .step .actions {
+      margin-top: 10px;
+    }
+
+    .step .actions .btn {
+      margin-top: 8px;
+    }
+
+    /* PRICING */
+    .pricing {
+      max-width: 520px;
+      padding: 42px;
+      border-radius: 26px;
+      background: linear-gradient(180deg, #fff, var(--bg-soft));
+      border: 1px solid var(--border);
+      box-shadow: var(--shadow);
+    }
+
+    .price {
+      font-size: 2.6rem;
+      font-weight: 800;
+      margin: 12px 0;
+    }
+
+    .pricing ul {
+      list-style: none;
+      margin-top: 20px;
+      display: grid;
+      gap: 10px;
+      color: var(--muted);
+    }
+
+    footer {
+      padding: 48px 0 0;
+      border-top: 1px solid var(--border);
+      color: var(--muted);
+      font-size: 0.9rem;
+      text-align: center;
+    }
+
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(30px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    @media (max-width: 900px) {
+      .hero { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="page">
+
+  <!-- HERO -->
+  <section class="hero">
+    <div>
+      <h1>Run your Discord like a professional team.</h1>
+      <p>
+        Gen Utils is a licensed Discord management bot built for serious communities.
+        It automates staff & media applications, promotions, strikes, and configuration —
+        so your team stays organized, accountable, and scalable.
+      </p>
+
+      <div class="hero-actions">
+        <a class="btn btn-primary" href="https://discord.com/api/oauth2/authorize?client_id=1447037570742620282&permissions=8&scope=bot%20applications.commands">Invite Bot</a>
+        <a class="btn" href="#pricing">Buy License</a>
+      </div>
+    </div>
+
+    <div class="hero-card">
+      <h3>Why Gen Utils?</h3>
+      <ul>
+        <li>• Built for long-term staff management</li>
+        <li>• License-protected per server</li>
+        <li>• Clean workflows your team understands</li>
+        <li>• No clutter, no gimmicks, just control</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- FEATURES -->
+  <section>
+    <div class="section-header">
+      <h2>Everything your staff system needs</h2>
+      <p>
+        Gen Utils replaces messy spreadsheets, unreliable bots, and manual moderation
+        with structured, automated systems designed for real teams.
+      </p>
+    </div>
+
+    <div class="features">
+      <div class="feature"><h3>Application System</h3><p>Modern modal-based applications for staff and media roles with cooldowns, previews, and blacklist checks.</p></div>
+      <div class="feature"><h3>Review & Decisions</h3><p>Applications are routed to review channels with accept/deny buttons and logged reasons.</p></div>
+      <div class="feature"><h3>Rank Hierarchies</h3><p>Custom staff and media rank trees with clear promotion and demotion logic.</p></div>
+      <div class="feature"><h3>Strike Management</h3><p>Issue and remove strikes with automatic demotions at thresholds and full audit logging.</p></div>
+      <div class="feature"><h3>Leave of Absence</h3><p>Staff can place themselves on LOA without admin intervention.</p></div>
+      <div class="feature"><h3>Licensing System</h3><p>Each server requires a valid license with verification, expiration, and revocation support.</p></div>
+    </div>
+  </section>
+
+  <!-- FLOW -->
+  <section>
+    <div class="section-header">
+      <h2>How licensing & setup works</h2>
+      <p>A clear, secure process that ensures every server is properly licensed and supported.</p>
+    </div>
+
+    <div class="flow">
+      <div class="step">
+        <span>STEP 01</span>
+        <h4>Purchase a license</h4>
+        <p>Buy a Gen Utils license directly from our official store to get started.</p>
+        <p style="margin-top:8px"><a class="btn" href="https://genutils.mysellauth.com/" target="_blank">Visit License Store</a></p>
+      </div>
+
+      <div class="step">
+        <span>STEP 02</span>
+        <h4>Join our Discord & open a ticket</h4>
+        <p>Join the Gen Utils Discord server and create a support ticket with proof of purchase.</p>
+        <p style="margin-top:8px;color:var(--muted)">Your license code will be issued manually to ensure security.</p>
+      </div>
+
+      <div class="step">
+        <span>STEP 03</span>
+        <h4>Invite the bot</h4>
+        <p>Invite Gen Utils to your Discord server using the official invite link.</p>
+        <p style="margin-top:8px"><a class="btn" href="https://discord.com/oauth2/authorize?client_id=1447037570742620282&permissions=8&integration_type=0&scope=bot" target="_blank">Invite Gen Utils</a></p>
+      </div>
+
+      <div class="step">
+        <span>STEP 04</span>
+        <h4>Verify your license</h4>
+        <p>Inside your server, run <code>/verifylicense &lt;code&gt;</code> to activate Gen Utils.</p>
+        <p style="margin-top:8px;color:var(--muted)">Once verified, all features unlock instantly.</p>
+      </div>
+
+      <div class="step">
+        <span>STEP 05</span>
+        <h4>Configure & manage</h4>
+        <p>Set up roles, channels, applications, and rank hierarchies using simple configuration commands.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- PRICING -->
+  <section id="pricing">
+    <div class="pricing">
+      <h2>Simple, transparent licensing</h2>
+      <p class="price">£29 / server</p>
+      <p class="muted">One-time payment per Discord server.</p>
+
+      <ul>
+        <li>✔ Full feature access</li>
+        <li>✔ License verification & protection</li>
+        <li>✔ Free updates</li>
+        <li>✔ Priority support (6 months)</li>
+      </ul>
+
+      <div style="margin-top:28px">
+        <a class="btn btn-primary" href="https://example.com/buy?product=gen-utils">Purchase License</a>
+      </div>
+    </div>
+  </section>
+
+  <footer>
+    © 2025 Gen Utils • Licensed Discord automation • Hosted on GitHub Pages
+  </footer>
+
+</div>
+
+</body>
+</html>

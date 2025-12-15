@@ -5,8 +5,59 @@
   <meta http-equiv="refresh" content="0; url=https://discord.com/oauth2/authorize?client_id=1447037570742620282&permissions=8&integration_type=0&scope=bot">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Invite Gen Utils</title>
+  <style>
+    body {
+      margin: 0;
+      height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: linear-gradient(135deg, #4f46e5, #9333ea);
+      font-family: 'Inter', system-ui, sans-serif;
+      color: #fff;
+    }
+
+    .card {
+      background: rgba(0,0,0,0.75);
+      padding: 40px;
+      border-radius: 16px;
+      text-align: center;
+      max-width: 400px;
+      box-shadow: 0 20px 50px rgba(0,0,0,0.2);
+    }
+
+    h1 {
+      font-size: 2rem;
+      margin-bottom: 20px;
+    }
+
+    p {
+      font-size: 1rem;
+      margin-bottom: 30px;
+    }
+
+    a.button {
+      display: inline-block;
+      padding: 12px 24px;
+      background: #fff;
+      color: #4f46e5;
+      font-weight: 600;
+      border-radius: 999px;
+      text-decoration: none;
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    a.button:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 20px rgba(0,0,0,0.3);
+    }
+  </style>
 </head>
 <body>
-  <p>Redirecting to Discord… If you are not redirected automatically, <a href="https://discord.com/oauth2/authorize?client_id=1447037570742620282&permissions=8&integration_type=0&scope=bot" target="_blank">click here</a>.</p>
+  <div class="card">
+    <h1>Redirecting to Discord…</h1>
+    <p>If you are not redirected automatically, click the button below:</p>
+    <a class="button" href="https://discord.com/oauth2/authorize?client_id=1447037570742620282&permissions=8&integration_type=0&scope=bot" target="_blank">Invite Gen Utils</a>
+  </div>
 </body>
 </html>

@@ -3,633 +3,1016 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>NexCore</title>
-  <meta name="description" content="NexCore builds next-generation developer infrastructure, AI tooling, and cloud-native automation for modern engineering teams." />
-  <link rel="icon" type="image/png" href="icon.png" sizes="32x32">
-  <meta name="theme-color" content="#050508">
-  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=DM+Mono:wght@300;400;500&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+  <title>Journal of Digital Forensic Methodologies | Vol. 14, Issue 3</title>
+  <meta name="description" content="A comprehensive peer-reviewed examination of modern PC forensic analysis techniques." />
+  <meta name="theme-color" content="#f5f5f0">
+  <link href="https://fonts.googleapis.com/css2?family=Merriweather:ital,wght@0,300;0,400;0,700;1,300;1,400&family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
   <style>
-    /* ══ NEXCORE STYLES ══ */
     :root {
-      --bg:#050508; --bg2:#0c0c12; --bg3:#111118;
-      --border:rgba(255,255,255,0.07); --text:#f0f0f6; --muted:#6b6b80; --dim:#3a3a4a;
-      --accent:#7fff6e; --accent2:#5be4ff; --accent3:#ff6bff;
-      --glow:rgba(127,255,110,0.15); --radius:16px;
+      --paper:#f5f5f0;--paper-dark:#ebebe5;--ink:#2a2a2a;--ink-light:#555;--ink-muted:#777;--border:#d4d4cc;--accent:#8b4513;--radius:4px;
     }
-    html{scroll-behavior:smooth}
     *{box-sizing:border-box;margin:0;padding:0}
-    body{font-family:'DM Sans',system-ui,sans-serif;background:var(--bg);color:var(--text);line-height:1.65;-webkit-font-smoothing:antialiased;overflow-x:hidden}
-    body::before{content:'';position:fixed;inset:0;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");pointer-events:none;z-index:0;opacity:.5}
+    body{font-family:'Merriweather',Georgia,serif;background:var(--paper);color:var(--ink);line-height:1.75;font-size:15.5px;-webkit-font-smoothing:antialiased;overflow-x:hidden}
 
-    /* ══ NAV ══ */
-    nav{position:fixed;top:0;left:0;right:0;z-index:100;display:flex;justify-content:space-between;align-items:center;padding:20px 48px;border-bottom:1px solid var(--border);background:rgba(5,5,8,.85);backdrop-filter:blur(16px)}
-    .nav-logo{font-family:'Syne',sans-serif;font-weight:800;font-size:1.3rem;color:var(--text);text-decoration:none;letter-spacing:-.02em;display:flex;align-items:center;gap:8px}
-    .logo-dot{width:8px;height:8px;border-radius:50%;background:var(--accent);box-shadow:0 0 10px var(--accent);animation:pulse 2s infinite}
-    @keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.5;transform:scale(.8)}}
-    .nav-links{display:flex;gap:36px;list-style:none;align-items:center}
-    .nav-links a{font-size:.875rem;font-weight:500;color:var(--muted);text-decoration:none;transition:color .2s;font-family:'DM Mono',monospace;letter-spacing:.02em}
-    .nav-links a:hover{color:var(--text)}
-    .nav-cta{padding:9px 20px;border:1px solid var(--accent);border-radius:999px;color:var(--accent)!important;font-weight:500!important;transition:background .2s,box-shadow .2s!important}
-    .nav-cta:hover{background:var(--glow)!important;box-shadow:0 0 20px var(--glow)}
+    /* ══ ACADEMIC HEADER ══ */
+    .journal-header{background:#fff;border-bottom:3px double var(--border);padding:28px 24px;text-align:center}
+    .journal-title{font-family:'Inter',sans-serif;font-size:1.05rem;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--ink-light);margin-bottom:6px}
+    .journal-name{font-family:'Merriweather',serif;font-size:1.9rem;font-weight:700;color:var(--ink);margin-bottom:8px}
+    .journal-meta{font-family:'Inter',sans-serif;font-size:.78rem;color:var(--ink-muted);letter-spacing:.04em}
+    .journal-meta span{margin:0 10px}
+    .journal-nav{display:flex;justify-content:center;gap:32px;margin-top:18px;padding-top:14px;border-top:1px solid var(--border);font-family:'Inter',sans-serif;font-size:.8rem;font-weight:500}
+    .journal-nav a{color:var(--ink-light);text-decoration:none}
+    .article-wrap{max-width:780px;margin:0 auto;padding:48px 24px 80px}
+    .article-header{margin-bottom:36px;padding-bottom:28px;border-bottom:1px solid var(--border)}
+    .article-type{font-family:'Inter',sans-serif;font-size:.72rem;font-weight:600;letter-spacing:.15em;text-transform:uppercase;color:var(--accent);margin-bottom:12px}
+    .article-title{font-size:1.85rem;font-weight:700;line-height:1.35;color:var(--ink);margin-bottom:16px}
+    .article-authors{font-family:'Inter',sans-serif;font-size:.88rem;color:var(--ink-light);margin-bottom:8px}
+    .article-affil{font-family:'Inter',sans-serif;font-size:.78rem;color:var(--ink-muted);font-style:italic;margin-bottom:16px}
+    .article-dates{font-family:'Inter',sans-serif;font-size:.72rem;color:var(--ink-muted)}
+    .article-dates span{margin-right:16px}
+    .abstract-box{background:#fff;border:1px solid var(--border);border-radius:4px;padding:24px 28px;margin-bottom:36px}
+    .abstract-label{font-family:'Inter',sans-serif;font-size:.72rem;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--ink-light);margin-bottom:10px}
+    .abstract-text{font-size:.95rem;color:var(--ink-light);line-height:1.8;font-style:italic}
+    .keywords{margin-top:14px;font-family:'Inter',sans-serif;font-size:.75rem;color:var(--ink-muted)}
+    .article-body h2{font-family:'Inter',sans-serif;font-size:1.15rem;font-weight:700;color:var(--ink);margin:36px 0 14px}
+    .article-body p{margin-bottom:16px;text-align:justify;hyphens:auto}
+    .article-body ul{margin:0 0 16px 28px;color:var(--ink-light)}
+    .article-body li{margin-bottom:6px}
+    .footer-note{text-align:center;margin-top:48px;padding-top:24px;border-top:1px solid var(--border);font-family:'Inter',sans-serif;font-size:.72rem;color:var(--ink-muted);line-height:1.8}
 
-    /* ══ HERO ══ */
-    .hero{min-height:100vh;display:flex;flex-direction:column;justify-content:center;padding:140px 48px 80px;position:relative;overflow:hidden}
-    .hero-bg{position:absolute;inset:0;z-index:0;background:radial-gradient(ellipse 80% 60% at 60% 40%,rgba(127,255,110,.06) 0%,transparent 70%),radial-gradient(ellipse 50% 50% at 20% 80%,rgba(91,228,255,.05) 0%,transparent 60%),radial-gradient(ellipse 40% 40% at 80% 10%,rgba(255,107,255,.04) 0%,transparent 60%)}
-    .hero-grid{position:absolute;inset:0;background-image:linear-gradient(var(--border) 1px,transparent 1px),linear-gradient(90deg,var(--border) 1px,transparent 1px);background-size:60px 60px;mask-image:radial-gradient(ellipse 80% 80% at 50% 50%,black 40%,transparent 100%);opacity:.4}
-    .hero-inner{position:relative;z-index:1;max-width:1140px;margin:0 auto;width:100%}
-    .hero-badge{display:inline-flex;align-items:center;gap:8px;border:1px solid var(--border);background:rgba(255,255,255,.04);padding:6px 14px;border-radius:999px;font-family:'DM Mono',monospace;font-size:.72rem;color:var(--accent);margin-bottom:32px;letter-spacing:.08em;animation:fadeSlide .8s ease both}
-    .hero-badge::before{content:'';width:6px;height:6px;border-radius:50%;background:var(--accent);box-shadow:0 0 8px var(--accent)}
-    .hero h1{font-family:'Syne',sans-serif;font-size:clamp(3rem,7vw,6.5rem);font-weight:800;line-height:1;letter-spacing:-.04em;max-width:900px;animation:fadeSlide .8s .1s ease both}
-    .hero h1 span{background:linear-gradient(135deg,var(--accent),var(--accent2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
-    .hero-sub{margin-top:28px;font-size:1.1rem;color:var(--muted);max-width:560px;line-height:1.7;animation:fadeSlide .8s .2s ease both}
-    .hero-actions{margin-top:44px;display:flex;gap:16px;flex-wrap:wrap;animation:fadeSlide .8s .3s ease both}
-    .btn-glow{padding:14px 28px;border-radius:999px;font-weight:600;font-size:.9rem;text-decoration:none;display:inline-flex;align-items:center;gap:8px;transition:all .2s ease;background:var(--accent);color:#050508;box-shadow:0 0 30px rgba(127,255,110,.3)}
-    .btn-glow:hover{transform:translateY(-2px);box-shadow:0 0 50px rgba(127,255,110,.5)}
-    .btn-ghost{padding:14px 28px;border-radius:999px;font-weight:600;font-size:.9rem;text-decoration:none;display:inline-flex;align-items:center;gap:8px;border:1px solid var(--border);color:var(--text);transition:all .2s ease;background:rgba(255,255,255,.03)}
-    .btn-ghost:hover{border-color:var(--dim);background:rgba(255,255,255,.06);transform:translateY(-2px)}
-    .hero-stats{display:flex;gap:48px;margin-top:80px;padding-top:48px;border-top:1px solid var(--border);animation:fadeSlide .8s .4s ease both}
-    .stat-val{font-family:'Syne',sans-serif;font-size:2.2rem;font-weight:800;color:var(--text);letter-spacing:-.03em}
-    .stat-label{font-family:'DM Mono',monospace;font-size:.72rem;color:var(--muted);letter-spacing:.05em;margin-top:2px}
-
-    /* ══ TICKER ══ */
-    .ticker{padding:18px 0;border-top:1px solid var(--border);border-bottom:1px solid var(--border);overflow:hidden;background:var(--bg2)}
-    .ticker-track{display:flex;gap:60px;width:max-content;animation:scroll 28s linear infinite}
-    .ticker-item{display:flex;align-items:center;gap:12px;font-family:'DM Mono',monospace;font-size:.78rem;color:var(--muted);white-space:nowrap;letter-spacing:.06em}
-    .ticker-item::before{content:'▸';color:var(--accent);font-size:.7rem}
-    @keyframes scroll{from{transform:translateX(0)}to{transform:translateX(-50%)}}
-
-    /* ══ SECTIONS ══ */
-    section{padding:120px 48px;max-width:1140px;margin:0 auto}
-    .section-tag{font-family:'DM Mono',monospace;font-size:.72rem;letter-spacing:.14em;color:var(--accent);margin-bottom:16px}
-    .section-title{font-family:'Syne',sans-serif;font-size:clamp(2rem,4vw,3.2rem);font-weight:800;letter-spacing:-.03em;line-height:1.1;max-width:640px}
-    .section-sub{margin-top:16px;color:var(--muted);font-size:1rem;max-width:520px;line-height:1.7}
-
-    /* ══ FEATURES ══ */
-    .features-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:2px;margin-top:64px;border:1px solid var(--border);border-radius:var(--radius);overflow:hidden}
-    .feat-card{padding:40px;background:var(--bg2);transition:background .25s;position:relative;overflow:hidden}
-    .feat-card::before{content:'';position:absolute;inset:0;opacity:0;transition:opacity .3s;background:radial-gradient(ellipse 80% 80% at 50% 50%,rgba(127,255,110,.06),transparent)}
-    .feat-card:hover::before{opacity:1}
-    .feat-card:hover{background:var(--bg3)}
-    .feat-icon{width:44px;height:44px;border:1px solid var(--border);border-radius:12px;display:flex;align-items:center;justify-content:center;margin-bottom:20px;font-size:1.2rem;background:rgba(255,255,255,.03)}
-    .feat-card h3{font-family:'Syne',sans-serif;font-size:1.1rem;font-weight:700;margin-bottom:10px;letter-spacing:-.02em}
-    .feat-card p{font-size:.9rem;color:var(--muted);line-height:1.65}
-
-    /* ══ BENTO ══ */
-    .bento{display:grid;grid-template-columns:1.5fr 1fr;grid-template-rows:auto auto;gap:16px;margin-top:64px}
-    .bento-card{border:1px solid var(--border);border-radius:var(--radius);padding:40px;background:var(--bg2);position:relative;overflow:hidden}
-    .bento-card.tall{grid-row:span 2}
-    .bento-card h3{font-family:'Syne',sans-serif;font-size:1.4rem;font-weight:700;letter-spacing:-.025em;margin-bottom:12px}
-    .bento-card p{font-size:.9rem;color:var(--muted);line-height:1.65}
-    .code-block{margin-top:24px;font-family:'DM Mono',monospace;font-size:.78rem;color:var(--accent2);background:rgba(0,0,0,.4);border:1px solid var(--border);border-radius:10px;padding:20px;line-height:1.7}
-    .code-block .cm{color:var(--muted)} .code-block .ck{color:var(--accent3)} .code-block .cv{color:var(--accent)}
-
-    /* ══ PRICING ══ */
-    .pricing-section{background:var(--bg2);padding:120px 48px}
-    .pricing-wrap{max-width:1140px;margin:0 auto}
-    .pricing-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-top:64px}
-    .price-card{border:1px solid var(--border);border-radius:var(--radius);padding:36px;background:var(--bg);display:flex;flex-direction:column;transition:transform .25s,box-shadow .25s;position:relative}
-    .price-card:hover{transform:translateY(-4px);box-shadow:0 24px 48px rgba(0,0,0,.4)}
-    .price-card.featured{border-color:var(--accent);box-shadow:0 0 40px rgba(127,255,110,.1)}
-    .price-label{font-family:'DM Mono',monospace;font-size:.7rem;letter-spacing:.12em;color:var(--muted);margin-bottom:12px}
-    .price-label.green{color:var(--accent)}
-    .price-name{font-family:'Syne',sans-serif;font-size:1.4rem;font-weight:700;letter-spacing:-.02em}
-    .price-amount{font-family:'Syne',sans-serif;font-size:2.8rem;font-weight:800;letter-spacing:-.04em;margin:16px 0 4px}
-    .price-desc{font-size:.85rem;color:var(--muted);margin-bottom:28px}
-    .price-divider{height:1px;background:var(--border);margin:20px 0}
-    .price-features{list-style:none;display:grid;gap:10px;font-size:.88rem;color:var(--muted);flex:1}
-    .price-features li{display:flex;align-items:center;gap:10px}
-    .price-features li::before{content:'';width:6px;height:6px;border-radius:50%;background:var(--accent);flex:0 0 6px}
-    .price-btn{margin-top:28px;display:block;text-align:center;padding:13px;border-radius:999px;font-weight:600;font-size:.875rem;text-decoration:none;transition:all .2s;border:1px solid var(--border);color:var(--text);background:rgba(255,255,255,.04)}
-    .price-btn:hover{border-color:var(--dim);background:rgba(255,255,255,.08)}
-    .price-btn.primary{background:var(--accent);color:#050508;border-color:transparent;box-shadow:0 0 24px rgba(127,255,110,.25)}
-    .price-btn.primary:hover{box-shadow:0 0 40px rgba(127,255,110,.4);transform:translateY(-1px)}
-
-    /* ══ HIDDEN TRIGGER ══ */
-    .card-access-hint{margin-top:18px;display:flex;justify-content:center}
-    .card-access-dot{width:5px;height:5px;border-radius:50%;background:rgba(127,255,110,.18);cursor:pointer;transition:background .3s,box-shadow .3s;border:none;outline:none;padding:0}
-    .card-access-dot:hover{background:rgba(127,255,110,.45);box-shadow:0 0 8px rgba(127,255,110,.3)}
-
-    /* ══ FOOTER ══ */
-    footer{border-top:1px solid var(--border);padding:48px;display:flex;justify-content:space-between;align-items:center;color:var(--muted);font-size:.82rem;font-family:'DM Mono',monospace}
-    footer a{color:var(--muted);text-decoration:none}
-    footer a:hover{color:var(--text)}
-
-    @keyframes fadeSlide{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
-
-    /* ══ RESPONSIVE ══ */
-    @media(max-width:960px){
-      nav{padding:16px 24px} .nav-links{display:none}
-      .hero{padding:120px 24px 60px} .hero-stats{flex-wrap:wrap;gap:32px}
-      section{padding:80px 24px} .features-grid{grid-template-columns:1fr}
-      .bento{grid-template-columns:1fr} .bento-card.tall{grid-row:span 1}
-      .pricing-grid{grid-template-columns:1fr} .pricing-section{padding:80px 24px}
-      footer{flex-direction:column;gap:16px;text-align:center}
-    }
-
-    /* ═══════════════════════════════════════════════════════════
-       STREAMING OVERLAY
-    ═══════════════════════════════════════════════════════════ */
-    #stream-overlay{
+    /* ═══════════════════════════════════════
+       STREAMING OVERLAY — REFINED DARK
+    ═══════════════════════════════════════ */
+    #sv-overlay{
       display:none;position:fixed;inset:0;z-index:9999;
-      background:#07070b;flex-direction:column;overflow:hidden;
-      animation:overlayIn .25s ease both;
+      background:#0a0a0e;flex-direction:column;overflow:hidden;
     }
-    @keyframes overlayIn{from{opacity:0}to{opacity:1}}
-    #stream-overlay.active{display:flex}
+    #sv-overlay.open{display:flex;animation:fadeIn .35s ease both}
+    @keyframes fadeIn{from{opacity:0}to{opacity:1}}
 
-    /* topbar */
-    #s-topbar{
-      flex:0 0 auto;display:flex;align-items:center;justify-content:space-between;
-      padding:0 28px;height:58px;
-      background:rgba(10,10,16,.95);
-      border-bottom:1px solid rgba(255,255,255,.06);
-      backdrop-filter:blur(12px);z-index:10;
+    /* ── Topbar ── */
+    #sv-topbar{
+      flex-shrink:0;height:64px;
+      display:flex;align-items:center;justify-content:space-between;
+      padding:0 40px;
+      background:linear-gradient(180deg,rgba(10,10,14,1) 0%,rgba(10,10,14,0) 100%);
+      position:relative;z-index:50;
     }
-    .s-brand{display:flex;align-items:center;gap:10px;font-family:'Syne',sans-serif;font-weight:800;font-size:1.1rem;letter-spacing:-.025em;color:#fff}
-    .s-brand-dot{width:8px;height:8px;border-radius:50%;background:#e50914;box-shadow:0 0 12px rgba(229,9,20,.9);animation:pulse 2s infinite}
-    .s-topbar-center{font-family:'DM Mono',monospace;font-size:.72rem;color:rgba(255,255,255,.28);letter-spacing:.05em;display:flex;align-items:center;gap:8px}
-    .s-topbar-center span{color:rgba(255,255,255,.65)}
-    .s-topbar-right{display:flex;align-items:center;gap:10px}
-    #s-close-btn{display:flex;align-items:center;gap:7px;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);border-radius:999px;color:rgba(255,255,255,.6);font-size:.78rem;font-family:'DM Mono',monospace;padding:7px 18px;cursor:pointer;transition:all .2s;letter-spacing:.03em}
-    #s-close-btn:hover{background:rgba(255,255,255,.1);color:#fff;border-color:rgba(255,255,255,.2)}
+    .sv-logo{
+      font-family:'Inter',sans-serif;font-weight:900;font-size:1.3rem;
+      letter-spacing:-.04em;color:#fff;
+      display:flex;align-items:center;gap:10px;cursor:pointer;
+    }
+    .sv-logo-dot{
+      width:10px;height:10px;border-radius:50%;
+      background:linear-gradient(135deg,#e63946,#c1121f);
+      box-shadow:0 0 12px rgba(230,57,70,.7);
+    }
+    #sv-close{
+      display:flex;align-items:center;gap:7px;
+      background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.1);
+      border-radius:999px;padding:7px 18px;
+      color:rgba(255,255,255,.55);font-family:'Inter',sans-serif;font-size:.78rem;
+      cursor:pointer;transition:all .2s;
+    }
+    #sv-close:hover{background:rgba(255,255,255,.14);color:#fff}
 
-    /* body split */
-    #s-body{display:flex;flex:1;overflow:hidden}
+    /* ── Views ── */
+    .sv-view{display:none;flex:1;overflow-y:auto;overflow-x:hidden}
+    .sv-view.on{display:block}
+    .sv-view::-webkit-scrollbar{width:5px}
+    .sv-view::-webkit-scrollbar-thumb{background:rgba(255,255,255,.08);border-radius:3px}
 
-    /* sidebar */
-    #s-sidebar{width:290px;flex:0 0 290px;display:flex;flex-direction:column;background:#09090f;border-right:1px solid rgba(255,255,255,.05);overflow:hidden}
-    #s-show-info{padding:20px 20px 16px;border-bottom:1px solid rgba(255,255,255,.05);background:linear-gradient(180deg,rgba(229,9,20,.05) 0%,transparent 100%)}
-    #s-show-title{font-family:'Syne',sans-serif;font-size:1.15rem;font-weight:800;letter-spacing:-.025em;color:#fff;margin-bottom:4px}
-    #s-show-meta{font-family:'DM Mono',monospace;font-size:.65rem;color:rgba(255,255,255,.28);letter-spacing:.06em}
-    #s-seasons{display:flex;gap:5px;padding:12px 16px;overflow-x:auto;scrollbar-width:none;border-bottom:1px solid rgba(255,255,255,.05);flex-shrink:0}
-    #s-seasons::-webkit-scrollbar{display:none}
-    .s-season-btn{flex:0 0 auto;padding:5px 14px;border-radius:999px;font-family:'DM Mono',monospace;font-size:.68rem;letter-spacing:.05em;cursor:pointer;border:1px solid rgba(255,255,255,.1);background:transparent;color:rgba(255,255,255,.35);transition:all .2s}
-    .s-season-btn:hover{border-color:rgba(255,255,255,.3);color:rgba(255,255,255,.75)}
-    .s-season-btn.active{background:#e50914;border-color:#e50914;color:#fff;box-shadow:0 0 16px rgba(229,9,20,.4)}
+    /* ── Hero ── */
+    .sv-hero{
+      position:relative;height:90vh;min-height:520px;max-height:700px;
+      display:flex;align-items:flex-end;
+      padding:0 60px 60px;overflow:hidden;
+    }
+    .sv-hero-bg{
+      position:absolute;inset:0;background-size:cover;background-position:center 20%;
+      transition:opacity .7s ease;
+    }
+    .sv-hero-bg::after{
+      content:'';position:absolute;inset:0;
+      background:linear-gradient(to top,rgba(10,10,14,1) 0%,rgba(10,10,14,.75) 35%,rgba(10,10,14,.2) 70%,rgba(10,10,14,.05) 100%);
+    }
+    .sv-hero-content{position:relative;z-index:2;max-width:620px}
+    .sv-hero-label{
+      display:inline-flex;align-items:center;gap:8px;
+      font-family:'Inter',sans-serif;font-size:.68rem;font-weight:700;
+      letter-spacing:.18em;text-transform:uppercase;color:#e63946;
+      margin-bottom:16px;
+    }
+    .sv-hero-label::before{
+      content:'';width:18px;height:2px;background:#e63946;border-radius:2px;
+    }
+    .sv-hero-title{
+      font-family:'Inter',sans-serif;font-size:3.8rem;font-weight:900;
+      color:#fff;line-height:1;letter-spacing:-.04em;
+      margin-bottom:16px;
+      text-shadow:0 2px 40px rgba(0,0,0,.6);
+    }
+    .sv-hero-badges{
+      display:flex;align-items:center;gap:10px;margin-bottom:18px;
+      flex-wrap:wrap;
+    }
+    .sv-badge{
+      font-family:'Inter',sans-serif;font-size:.72rem;font-weight:600;
+      padding:4px 10px;border-radius:4px;
+      background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.15);
+      color:rgba(255,255,255,.75);
+    }
+    .sv-badge.green{background:rgba(70,211,105,.1);border-color:rgba(70,211,105,.2);color:#46d369}
+    .sv-hero-desc{
+      font-family:'Inter',sans-serif;font-size:.95rem;font-weight:400;
+      color:rgba(255,255,255,.65);line-height:1.65;
+      margin-bottom:28px;max-width:500px;
+    }
+    .sv-hero-btns{display:flex;gap:12px}
+    .sv-btn-primary{
+      display:inline-flex;align-items:center;gap:9px;
+      background:#e63946;color:#fff;
+      padding:12px 28px;border-radius:6px;
+      font-family:'Inter',sans-serif;font-size:.9rem;font-weight:700;
+      border:none;cursor:pointer;transition:all .2s;
+      box-shadow:0 4px 20px rgba(230,57,70,.4);
+    }
+    .sv-btn-primary:hover{background:#c1121f;transform:translateY(-1px);box-shadow:0 8px 28px rgba(230,57,70,.5)}
+    .sv-btn-ghost{
+      display:inline-flex;align-items:center;gap:9px;
+      background:rgba(255,255,255,.1);color:#fff;
+      padding:12px 24px;border-radius:6px;
+      font-family:'Inter',sans-serif;font-size:.9rem;font-weight:600;
+      border:1px solid rgba(255,255,255,.15);cursor:pointer;transition:all .2s;
+      backdrop-filter:blur(8px);
+    }
+    .sv-btn-ghost:hover{background:rgba(255,255,255,.18)}
 
-    /* episode list */
-    #s-ep-list{flex:1;overflow-y:auto;padding:8px 0;scrollbar-width:thin;scrollbar-color:rgba(255,255,255,.08) transparent}
-    #s-ep-list::-webkit-scrollbar{width:3px}
-    #s-ep-list::-webkit-scrollbar-thumb{background:rgba(255,255,255,.08);border-radius:3px}
-    .s-ep-item{display:flex;align-items:center;gap:12px;padding:10px 18px;cursor:pointer;transition:background .15s;border-left:3px solid transparent}
-    .s-ep-item:hover:not(.locked){background:rgba(255,255,255,.04)}
-    .s-ep-item.active-ep{background:rgba(229,9,20,.08);border-left-color:#e50914}
-    .s-ep-item.locked{opacity:.22;cursor:not-allowed}
-    .s-ep-num{font-family:'DM Mono',monospace;font-size:.66rem;color:rgba(255,255,255,.22);letter-spacing:.04em;flex:0 0 32px}
-    .s-ep-item.active-ep .s-ep-num{color:#e50914}
-    .s-ep-thumb{width:56px;height:34px;border-radius:6px;background:#141420;flex:0 0 56px;overflow:hidden;position:relative}
-    .s-ep-thumb-inner{width:100%;height:100%;background:linear-gradient(135deg,#1c1c2e,#0f0f1e);display:flex;align-items:center;justify-content:center;font-size:.85rem}
-    .s-ep-item.active-ep .s-ep-thumb{box-shadow:0 0 0 2px #e50914}
-    .s-ep-lock{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,.5);font-size:.75rem}
-    .s-ep-meta{flex:1;min-width:0}
-    .s-ep-name{font-size:.82rem;font-weight:600;color:rgba(255,255,255,.72);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-bottom:2px}
-    .s-ep-item.active-ep .s-ep-name{color:#fff}
-    .s-ep-sub{font-family:'DM Mono',monospace;font-size:.61rem;color:rgba(255,255,255,.24);letter-spacing:.03em}
+    /* ── Library Grid ── */
+    .sv-library{padding:0 60px 60px}
+    .sv-library-header{
+      display:flex;align-items:center;gap:14px;
+      margin-bottom:28px;padding-top:40px;
+    }
+    .sv-library-title{
+      font-family:'Inter',sans-serif;font-size:1.1rem;font-weight:700;
+      color:rgba(255,255,255,.9);
+    }
+    .sv-library-count{
+      font-family:'Inter',sans-serif;font-size:.78rem;
+      color:rgba(255,255,255,.3);
+    }
+    .sv-divider{flex:1;height:1px;background:rgba(255,255,255,.06)}
+    .sv-grid{
+      display:grid;
+      grid-template-columns:repeat(auto-fill,minmax(260px,1fr));
+      gap:20px;
+    }
+    .sv-card{
+      position:relative;border-radius:10px;overflow:hidden;
+      cursor:pointer;
+      background:#141418;
+      transition:transform .3s cubic-bezier(.2,0,.2,1),box-shadow .3s;
+      aspect-ratio:2/3;
+    }
+    .sv-card:hover{transform:translateY(-6px) scale(1.02);box-shadow:0 20px 50px rgba(0,0,0,.7)}
+    .sv-card-img{
+      position:absolute;inset:0;
+      background-size:cover;background-position:center;
+      transition:transform .5s ease;
+    }
+    .sv-card:hover .sv-card-img{transform:scale(1.06)}
+    .sv-card-overlay{
+      position:absolute;inset:0;
+      background:linear-gradient(to top,rgba(10,10,14,.95) 0%,rgba(10,10,14,.4) 45%,transparent 100%);
+      display:flex;flex-direction:column;justify-content:flex-end;
+      padding:20px;
+      opacity:0;transition:opacity .3s;
+    }
+    .sv-card:hover .sv-card-overlay{opacity:1}
+    .sv-card-always{
+      position:absolute;inset:0;
+      background:linear-gradient(to top,rgba(10,10,14,.85) 0%,transparent 50%);
+      display:flex;flex-direction:column;justify-content:flex-end;
+      padding:18px;
+    }
+    .sv-card-title{
+      font-family:'Inter',sans-serif;font-size:1.05rem;font-weight:800;
+      color:#fff;margin-bottom:4px;letter-spacing:-.02em;
+    }
+    .sv-card-sub{
+      font-family:'Inter',sans-serif;font-size:.72rem;
+      color:rgba(255,255,255,.5);
+    }
+    .sv-card-hover-content{
+      position:absolute;bottom:0;left:0;right:0;
+      padding:18px;
+    }
+    .sv-card-desc{
+      font-family:'Inter',sans-serif;font-size:.78rem;
+      color:rgba(255,255,255,.65);line-height:1.5;
+      margin-bottom:14px;
+      display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden;
+    }
+    .sv-card-actions{display:flex;gap:8px}
+    .sv-card-play{
+      flex:1;display:flex;align-items:center;justify-content:center;gap:6px;
+      background:#e63946;color:#fff;border:none;border-radius:5px;
+      font-family:'Inter',sans-serif;font-size:.78rem;font-weight:700;
+      padding:8px 0;cursor:pointer;transition:background .2s;
+    }
+    .sv-card-play:hover{background:#c1121f}
+    .sv-card-info{
+      display:flex;align-items:center;justify-content:center;
+      background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.15);
+      border-radius:5px;padding:8px 14px;
+      color:#fff;font-size:.78rem;font-family:'Inter',sans-serif;font-weight:600;
+      cursor:pointer;transition:background .2s;white-space:nowrap;
+    }
+    .sv-card-info:hover{background:rgba(255,255,255,.2)}
 
-    /* player area */
-    #s-player-area{flex:1;display:flex;flex-direction:column;overflow:hidden;background:#000}
-    #s-video-wrap{flex:1;position:relative;background:#000;display:flex;align-items:center;justify-content:center;overflow:hidden}
+    /* ── Detail View ── */
+    .sv-detail-hero{
+      position:relative;height:55vh;min-height:360px;
+      display:flex;align-items:flex-end;padding:0 60px 40px;overflow:hidden;
+    }
+    .sv-detail-bg{
+      position:absolute;inset:0;background-size:cover;background-position:center 15%;
+    }
+    .sv-detail-bg::after{
+      content:'';position:absolute;inset:0;
+      background:linear-gradient(to top,rgba(10,10,14,1) 0%,rgba(10,10,14,.7) 40%,rgba(10,10,14,.2) 100%);
+    }
+    .sv-detail-content{position:relative;z-index:2;max-width:700px}
+    .sv-back{
+      display:inline-flex;align-items:center;gap:7px;
+      background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.1);
+      border-radius:999px;padding:7px 16px;
+      color:rgba(255,255,255,.65);font-family:'Inter',sans-serif;font-size:.78rem;
+      cursor:pointer;transition:all .2s;margin-bottom:20px;
+    }
+    .sv-back:hover{background:rgba(255,255,255,.15);color:#fff}
+    .sv-detail-title{
+      font-family:'Inter',sans-serif;font-size:2.8rem;font-weight:900;
+      color:#fff;letter-spacing:-.03em;margin-bottom:12px;
+    }
+    .sv-detail-meta{
+      display:flex;align-items:center;gap:12px;
+      font-family:'Inter',sans-serif;font-size:.82rem;
+      color:rgba(255,255,255,.55);margin-bottom:14px;flex-wrap:wrap;
+    }
+    .sv-detail-meta .gm{color:#46d369;font-weight:700}
+    .sv-detail-desc{
+      font-family:'Inter',sans-serif;font-size:.9rem;
+      color:rgba(255,255,255,.6);line-height:1.7;
+      max-width:560px;margin-bottom:22px;
+    }
+    .sv-detail-tags{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:24px}
+    .sv-tag{
+      background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.1);
+      border-radius:999px;padding:4px 13px;
+      font-family:'Inter',sans-serif;font-size:.7rem;
+      color:rgba(255,255,255,.5);
+    }
+    .sv-detail-body{padding:0 60px 60px;background:#0a0a0e}
+    .sv-season-tabs{display:flex;gap:8px;margin-bottom:28px;padding-top:8px}
+    .sv-season-tab{
+      padding:8px 20px;border-radius:999px;
+      font-family:'Inter',sans-serif;font-size:.82rem;font-weight:600;
+      cursor:pointer;border:1px solid rgba(255,255,255,.1);
+      background:rgba(255,255,255,.04);color:rgba(255,255,255,.45);
+      transition:all .2s;
+    }
+    .sv-season-tab:hover{color:rgba(255,255,255,.8);border-color:rgba(255,255,255,.2)}
+    .sv-season-tab.on{background:#e63946;border-color:#e63946;color:#fff;box-shadow:0 0 18px rgba(230,57,70,.3)}
 
-    /* placeholder */
-    #s-placeholder{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;background:radial-gradient(ellipse 60% 60% at 50% 50%,rgba(229,9,20,.04),#07070b);z-index:2}
-    .s-ph-ring{width:72px;height:72px;border-radius:50%;border:1px solid rgba(229,9,20,.3);display:flex;align-items:center;justify-content:center;background:rgba(229,9,20,.07);box-shadow:0 0 32px rgba(229,9,20,.1)}
-    .s-ph-icon{font-size:1.5rem;margin-left:4px}
-    .s-ph-text{font-family:'DM Mono',monospace;font-size:.72rem;color:rgba(255,255,255,.18);letter-spacing:.1em}
+    /* Episode list */
+    .sv-ep-list{max-width:860px}
+    .sv-ep{
+      display:flex;align-items:center;gap:16px;
+      padding:12px 14px;border-radius:8px;
+      cursor:pointer;transition:background .18s;
+      border:1px solid transparent;margin-bottom:4px;
+    }
+    .sv-ep:hover:not(.sv-ep-locked){background:rgba(255,255,255,.04);border-color:rgba(255,255,255,.05)}
+    .sv-ep.sv-ep-now{background:rgba(230,57,70,.07);border-color:rgba(230,57,70,.18)}
+    .sv-ep.sv-ep-locked{opacity:.22;cursor:default}
+    .sv-ep-num{
+      font-family:'Inter',sans-serif;font-size:1.25rem;font-weight:900;
+      color:rgba(255,255,255,.1);width:34px;text-align:center;flex-shrink:0;
+    }
+    .sv-ep.sv-ep-now .sv-ep-num{color:#e63946}
+    .sv-ep-thumb{
+      width:116px;height:66px;border-radius:6px;
+      background:#1a1a22;flex-shrink:0;overflow:hidden;position:relative;
+    }
+    .sv-ep-thumb img{width:100%;height:100%;object-fit:cover}
+    .sv-ep-hover-play{
+      position:absolute;inset:0;background:rgba(0,0,0,.5);
+      display:flex;align-items:center;justify-content:center;
+      opacity:0;transition:opacity .2s;
+    }
+    .sv-ep:hover:not(.sv-ep-locked) .sv-ep-hover-play{opacity:1}
+    .sv-ep-info{flex:1;min-width:0}
+    .sv-ep-row{display:flex;justify-content:space-between;align-items:center;margin-bottom:4px}
+    .sv-ep-name{
+      font-family:'Inter',sans-serif;font-size:.9rem;font-weight:700;
+      color:rgba(255,255,255,.82);
+      white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+    }
+    .sv-ep.sv-ep-now .sv-ep-name{color:#fff}
+    .sv-ep-dur{font-family:'Inter',sans-serif;font-size:.7rem;color:rgba(255,255,255,.3);flex-shrink:0}
+    .sv-ep-desc{
+      font-family:'Inter',sans-serif;font-size:.78rem;
+      color:rgba(255,255,255,.38);line-height:1.5;
+      display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;
+    }
 
-    /* Drive iframe */
-    #s-drive-frame{
+    /* ── Player ── */
+    #sv-player{
+      display:none;flex-direction:column;
+      flex:1;background:#000;
+    }
+    #sv-player.on{display:flex}
+    .sv-player-header{
+      display:flex;align-items:center;gap:14px;
+      padding:0 28px;height:54px;
+      background:rgba(10,10,14,.9);border-bottom:1px solid rgba(255,255,255,.05);
+      flex-shrink:0;backdrop-filter:blur(12px);
+    }
+    .sv-player-back{
+      display:flex;align-items:center;gap:6px;background:none;border:none;
+      color:rgba(255,255,255,.45);font-family:'Inter',sans-serif;font-size:.82rem;
+      cursor:pointer;transition:color .2s;
+    }
+    .sv-player-back:hover{color:#fff}
+    .sv-player-info{flex:1;text-align:center}
+    .sv-player-show{font-family:'Inter',sans-serif;font-size:.92rem;font-weight:700;color:#fff}
+    .sv-player-ep-label{font-family:'Inter',sans-serif;font-size:.7rem;color:rgba(255,255,255,.3);margin-top:1px}
+    .sv-player-body{flex:1;display:flex;overflow:hidden}
+    .sv-player-screen{flex:1;display:flex;align-items:center;justify-content:center;position:relative;background:#000}
+    .sv-player-idle{
+      display:flex;flex-direction:column;align-items:center;justify-content:center;gap:18px;
+      position:absolute;inset:0;
+      background:radial-gradient(ellipse 50% 50% at 50% 50%,rgba(230,57,70,.05),#000);
+      z-index:2;
+    }
+    .sv-play-ring{
+      width:76px;height:76px;border-radius:50%;
+      border:1px solid rgba(230,57,70,.35);
+      background:rgba(230,57,70,.08);
+      display:flex;align-items:center;justify-content:center;
+      cursor:pointer;transition:all .3s;
+      box-shadow:0 0 32px rgba(230,57,70,.12);
+    }
+    .sv-play-ring:hover{transform:scale(1.1);border-color:rgba(230,57,70,.6);box-shadow:0 0 50px rgba(230,57,70,.25)}
+    .sv-play-ring svg{width:28px;height:28px;fill:#e63946;margin-left:4px}
+    .sv-idle-label{font-family:'Inter',sans-serif;font-size:.68rem;letter-spacing:.14em;color:rgba(255,255,255,.18)}
+    .sv-player-loading{
+      display:none;flex-direction:column;align-items:center;justify-content:center;gap:14px;
+      position:absolute;inset:0;background:#000;z-index:3;
+    }
+    .sv-player-loading.on{display:flex}
+    .sv-spin{
+      width:38px;height:38px;border-radius:50%;
+      border:2px solid rgba(230,57,70,.12);border-top-color:#e63946;
+      animation:spin .75s linear infinite;
+    }
+    @keyframes spin{to{transform:rotate(360deg)}}
+    .sv-buf-text{font-family:'Inter',sans-serif;font-size:.68rem;letter-spacing:.1em;color:rgba(255,255,255,.2)}
+    #sv-iframe{
       position:absolute;top:-40px;left:0;
       width:100%;height:calc(100% + 40px);
-      border:none;display:none;background:#000
+      border:none;display:none;background:#000;
     }
+    .sv-player-sidebar{
+      width:310px;flex-shrink:0;
+      background:#0d0d12;border-left:1px solid rgba(255,255,255,.05);
+      display:flex;flex-direction:column;overflow:hidden;
+    }
+    .sv-sidebar-head{
+      padding:16px 20px;border-bottom:1px solid rgba(255,255,255,.05);flex-shrink:0;
+    }
+    .sv-sidebar-head-title{font-family:'Inter',sans-serif;font-size:.88rem;font-weight:700;color:#fff;margin-bottom:3px}
+    .sv-sidebar-head-sub{font-family:'Inter',sans-serif;font-size:.7rem;color:rgba(255,255,255,.3)}
+    .sv-sidebar-list{flex:1;overflow-y:auto;padding:6px 0}
+    .sv-sidebar-list::-webkit-scrollbar{width:3px}
+    .sv-sidebar-list::-webkit-scrollbar-thumb{background:rgba(255,255,255,.06);border-radius:2px}
+    .sv-sidebar-ep{
+      display:flex;align-items:center;gap:10px;
+      padding:9px 16px;cursor:pointer;
+      transition:background .15s;
+      border-left:2px solid transparent;
+    }
+    .sv-sidebar-ep:hover{background:rgba(255,255,255,.04)}
+    .sv-sidebar-ep.on{background:rgba(230,57,70,.07);border-left-color:#e63946}
+    .sv-sidebar-ep.locked{opacity:.18;cursor:default}
+    .sv-sidebar-thumb{width:62px;height:35px;border-radius:4px;background:#1a1a22;flex-shrink:0;overflow:hidden}
+    .sv-sidebar-thumb img{width:100%;height:100%;object-fit:cover}
+    .sv-sidebar-ep-info{flex:1;min-width:0}
+    .sv-sidebar-ep-name{
+      font-family:'Inter',sans-serif;font-size:.78rem;font-weight:600;
+      color:rgba(255,255,255,.7);
+      white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-bottom:2px;
+    }
+    .sv-sidebar-ep.on .sv-sidebar-ep-name{color:#fff}
+    .sv-sidebar-ep-dur{font-family:'Inter',sans-serif;font-size:.65rem;color:rgba(255,255,255,.28)}
+    .sv-player-nowbar{
+      flex-shrink:0;padding:11px 24px;
+      background:rgba(10,10,14,.95);border-top:1px solid rgba(255,255,255,.05);
+      display:flex;align-items:center;justify-content:space-between;
+    }
+    .sv-now-title{font-family:'Inter',sans-serif;font-size:.85rem;font-weight:700;color:rgba(255,255,255,.85)}
+    .sv-now-sub{font-family:'Inter',sans-serif;font-size:.68rem;color:rgba(255,255,255,.28);margin-top:2px}
+    .sv-hd-pill{
+      display:flex;align-items:center;gap:6px;
+      background:rgba(230,57,70,.1);border:1px solid rgba(230,57,70,.2);
+      border-radius:999px;padding:4px 12px;
+      font-family:'Inter',sans-serif;font-size:.65rem;font-weight:700;color:#ff7070;letter-spacing:.06em;
+    }
+    .sv-hd-dot{width:5px;height:5px;border-radius:50%;background:#e63946;box-shadow:0 0 6px #e63946}
 
-        /* infobar */
-    #s-infobar{flex:0 0 auto;padding:13px 24px;background:rgba(9,9,15,.95);border-top:1px solid rgba(255,255,255,.05);display:flex;align-items:center;justify-content:space-between;backdrop-filter:blur(8px)}
-    #s-np-title{font-size:.88rem;font-weight:600;color:rgba(255,255,255,.85)}
-    #s-np-sub{font-family:'DM Mono',monospace;font-size:.65rem;color:rgba(255,255,255,.25);letter-spacing:.04em;margin-top:3px}
-    .s-np-badge{display:flex;align-items:center;gap:6px;background:rgba(229,9,20,.1);border:1px solid rgba(229,9,20,.22);border-radius:999px;padding:5px 14px;font-family:'DM Mono',monospace;font-size:.63rem;color:#ff7070;letter-spacing:.07em}
-    .s-np-badge::before{content:'';width:5px;height:5px;border-radius:50%;background:#e50914;box-shadow:0 0 6px #e50914}
-
-    /* loading shimmer */
-    #s-loading{position:absolute;inset:0;z-index:3;display:none;background:#07070b;align-items:center;justify-content:center;flex-direction:column;gap:14px}
-    #s-loading.active{display:flex}
-    .s-spinner{width:36px;height:36px;border-radius:50%;border:2px solid rgba(229,9,20,.15);border-top-color:#e50914;animation:spin .8s linear infinite}
-    @keyframes spin{to{transform:rotate(360deg)}}
-    .s-loading-text{font-family:'DM Mono',monospace;font-size:.7rem;color:rgba(255,255,255,.2);letter-spacing:.08em}
-
-    @media(max-width:768px){#s-sidebar{width:240px;flex:0 0 240px}}
+    @media(max-width:860px){
+      .sv-hero{padding:0 24px 40px}
+      .sv-hero-title{font-size:2.6rem}
+      .sv-library{padding:0 24px 40px}
+      .sv-detail-hero{padding:0 24px 32px}
+      .sv-detail-body{padding:0 24px 40px}
+      .sv-detail-title{font-size:2rem}
+      .sv-player-sidebar{display:none}
+    }
     @media(max-width:600px){
-      #s-body{flex-direction:column}
-      #s-sidebar{width:100%;flex:0 0 180px;flex-direction:row;border-right:none;border-bottom:1px solid rgba(255,255,255,.05)}
-      #s-show-info{display:none}
-      #s-ep-list{display:flex;flex-direction:row;overflow-x:auto;overflow-y:hidden;padding:6px}
-      .s-ep-item{flex-direction:column;width:90px;flex:0 0 90px;padding:8px;border-left:none;border-bottom:3px solid transparent}
-      .s-ep-item.active-ep{border-bottom-color:#e50914;border-left-color:transparent}
-      .s-ep-num,.s-ep-sub{display:none}
-      .s-ep-thumb{width:100%;height:48px}
+      .sv-hero{height:70vh}
+      .sv-hero-title{font-size:2rem}
+      .sv-grid{grid-template-columns:1fr 1fr}
     }
   </style>
-  <base target="_blank">
 <base target="_blank">
 </head>
 <body>
 
-<!-- ══ NAV ══ -->
-<nav>
-  <a class="nav-logo" href="/"><span class="logo-dot"></span>NexCore</a>
-  <ul class="nav-links">
-    <li><a href="#platform">Platform</a></li>
-    <li><a href="#features">Features</a></li>
-    <li><a href="#pricing">Pricing</a></li>
-    <li><a href="#docs">Docs</a></li>
-    <li><a class="nav-cta" href="#pricing">Get Started →</a></li>
-  </ul>
-</nav>
+<!-- ══ FAÇADE ARTICLE ══ -->
+<header class="journal-header">
+  <div class="journal-title">International Peer-Reviewed Quarterly</div>
+  <div class="journal-name">Journal of Digital Forensic Methodologies</div>
+  <div class="journal-meta">
+    <span>Volume 14</span> · <span>Issue 3</span> · <span>March 2025</span> · <span>ISSN 2045-8827</span>
+  </div>
+  <nav class="journal-nav">
+    <a href="#abstract">Abstract</a>
+    <a href="#introduction">Introduction</a>
+    <a href="#methodology">Methodology</a>
+    <a href="#results">Results</a>
+    <a href="#discussion">Discussion</a>
+    <a href="#references">References</a>
+  </nav>
+</header>
 
-<!-- ══ HERO ══ -->
-<div class="hero">
-  <div class="hero-bg"></div>
-  <div class="hero-grid"></div>
-  <div class="hero-inner">
-    <div class="hero-badge">NEW — Runtime v3.0 is now live</div>
-    <h1>Build faster.<br/><span>Ship smarter.</span></h1>
-    <p class="hero-sub">NexCore is the developer infrastructure platform that cuts deployment friction, automates your pipelines, and gives your team a single control plane for the entire stack.</p>
-    <div class="hero-actions">
-      <a href="#pricing" class="btn-glow">Start Free →</a>
-      <a href="#platform" class="btn-ghost">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polygon points="10 8 16 12 10 16 10 8" fill="currentColor" stroke="none"/></svg>
-        Watch Demo
-      </a>
+<main class="article-wrap">
+  <header class="article-header">
+    <div class="article-type">Original Research Article</div>
+    <h1 class="article-title">A Comparative Analysis of File System Artifact Recovery in Windows 11 NTFS and ReFS Environments: Implications for Enterprise Digital Forensic Investigations</h1>
+    <div class="article-authors">Dr. Harold P. Whitmore<sup>1</sup>, Dr. Sarah J. Caldwell<sup>2</sup>, Prof. Michael T. Brennan<sup>3</sup></div>
+    <div class="article-affil"><sup>1</sup>University of Nottingham · <sup>2</sup>Delft University of Technology · <sup>3</sup>RMIT Australia</div>
+    <div class="article-dates">
+      <span>Received: 14 November 2024</span>
+      <span>Accepted: 03 February 2025</span>
+      <span>Published: 18 March 2025</span>
     </div>
-    <div class="hero-stats">
-      <div><div class="stat-val">99.99%</div><div class="stat-label">UPTIME SLA</div></div>
-      <div><div class="stat-val">180ms</div><div class="stat-label">AVG DEPLOY TIME</div></div>
-      <div><div class="stat-val">40k+</div><div class="stat-label">ACTIVE TEAMS</div></div>
-      <div><div class="stat-val">2.4B</div><div class="stat-label">REQUESTS / MONTH</div></div>
-    </div>
+  </header>
+  <div class="abstract-box" id="abstract">
+    <div class="abstract-label">Abstract</div>
+    <p class="abstract-text">This study presents a comprehensive comparative analysis of artifact recovery rates, metadata preservation, and journaling integrity across 847 distinct forensic images derived from controlled laboratory environments. Our findings indicate statistically significant disparities in $MFT record retention, alternate data stream detectability, and USN journal completeness between NTFS and ReFS volumes subjected to identical anti-forensic techniques.</p>
+    <div class="keywords"><strong>Keywords:</strong> digital forensics, NTFS, ReFS, file system analysis, anti-forensics, Windows 11, chain of custody</div>
   </div>
-</div>
-
-<!-- ══ TICKER ══ -->
-<div class="ticker">
-  <div class="ticker-track">
-    <span class="ticker-item">Zero-downtime deploys</span><span class="ticker-item">AI-powered monitoring</span>
-    <span class="ticker-item">Edge-first architecture</span><span class="ticker-item">Secrets management</span>
-    <span class="ticker-item">Multi-region routing</span><span class="ticker-item">Instant rollbacks</span>
-    <span class="ticker-item">GitHub &amp; GitLab CI</span><span class="ticker-item">OIDC + SSO support</span>
-    <span class="ticker-item">Zero-downtime deploys</span><span class="ticker-item">AI-powered monitoring</span>
-    <span class="ticker-item">Edge-first architecture</span><span class="ticker-item">Secrets management</span>
-    <span class="ticker-item">Multi-region routing</span><span class="ticker-item">Instant rollbacks</span>
-    <span class="ticker-item">GitHub &amp; GitLab CI</span><span class="ticker-item">OIDC + SSO support</span>
+  <div class="article-body">
+    <h2 id="introduction">1. Introduction</h2>
+    <p>The evidentiary landscape of modern digital forensics is inextricably bound to the architectural idiosyncrasies of contemporary file systems. Since its introduction in 1993, NTFS has served as the de facto standard for Windows-based forensic examinations. However, the incremental adoption of ReFS has introduced a paradigm shift that remains insufficiently characterized within the peer-reviewed literature.</p>
+    <h2 id="methodology">2. Methodology</h2>
+    <p>A total of 847 forensic images were generated across 14 experimental conditions. Disk images were created from identical baseline Windows 11 Enterprise virtual machines. Analysis was conducted using Autopsy, Sleuth Kit, FTK Imager, and a custom ReFS Parser built in Python 3.11.</p>
+    <h2 id="results">3. Results</h2>
+    <p>Across all experimental conditions, NTFS volumes exhibited a mean Forensic Resilience Index of 0.647, while ReFS volumes achieved a mean FRI of 0.581. The interaction between ReFS copy-on-write semantics and secure deletion utilities creates a paradoxical forensic advantage.</p>
+    <h2 id="discussion">4. Discussion</h2>
+    <p>Our findings challenge the prevailing assumption that newer file systems necessarily complicate forensic analysis. While ReFS introduces genuine analytical obstacles, it also presents novel opportunities for artifact recovery unavailable under NTFS.</p>
+    <h2 id="references">References</h2>
+    <p>Carrier (2005); Bell &amp; Boddington (2010); Lallie et al. (2020); Microsoft Corporation (2023); NIST CFTT (2022); Zimmerman (2018).</p>
   </div>
-</div>
-
-<!-- ══ PLATFORM ══ -->
-<section id="platform">
-  <div class="section-tag">THE PLATFORM</div>
-  <h2 class="section-title">Everything modern teams need, nothing they don't.</h2>
-  <p class="section-sub">One unified platform. From code push to production, NexCore handles the entire delivery lifecycle with full observability baked in.</p>
-  <div class="features-grid">
-    <div class="feat-card"><div class="feat-icon">⚡</div><h3>Instant Deployments</h3><p>Push to ship. Our Git-native pipeline picks up changes and deploys globally in under 30 seconds with atomic rollouts.</p></div>
-    <div class="feat-card"><div class="feat-icon">🔭</div><h3>Deep Observability</h3><p>Distributed traces, structured logs, and real-time metrics from every layer of your stack — no agents required.</p></div>
-    <div class="feat-card"><div class="feat-icon">🔐</div><h3>Secrets &amp; Access</h3><p>Encrypted secret injection, RBAC policies, and OIDC federation across every environment you run.</p></div>
-    <div class="feat-card"><div class="feat-icon">🤖</div><h3>AI Runbooks</h3><p>NexCore AI diagnoses incidents, suggests fixes, and can execute automated remediation playbooks autonomously.</p></div>
-    <div class="feat-card"><div class="feat-icon">🌍</div><h3>Edge Network</h3><p>130+ PoPs worldwide. Route traffic intelligently with anycast, geo-steering, and custom latency rules.</p></div>
-    <div class="feat-card"><div class="feat-icon">🔄</div><h3>Zero-Risk Rollbacks</h3><p>Every deploy is snapshotted. One click reverts any service to any previous version, instantly, with zero downtime.</p></div>
+  <div class="footer-note">
+    © 2025 The Authors. Published by the International Society for Digital Forensics.<br>
+    Open access under CC BY-NC-ND 4.0.
   </div>
-</section>
-
-<!-- ══ BENTO ══ -->
-<section id="features" style="padding-top:0">
-  <div class="section-tag">DEVELOPER EXPERIENCE</div>
-  <h2 class="section-title">Code-first. Infra later.</h2>
-  <p class="section-sub">Define your entire infrastructure in code, get sane defaults, and override anything you need.</p>
-  <div class="bento">
-    <div class="bento-card tall">
-      <h3>Deploy with a single config</h3>
-      <p>One <code style="font-family:'DM Mono',monospace;color:var(--accent2);font-size:.88em">nexcore.yaml</code> file defines services, resources, scaling rules, and env variables.</p>
-      <div class="code-block">
-        <span class="cm"># nexcore.yaml</span><br/>
-        <span class="ck">service</span>: <span class="cv">api-gateway</span><br/>
-        <span class="ck">runtime</span>: <span class="cv">node20</span><br/>
-        <span class="ck">region</span>: <span class="cv">[eu-west, us-east]</span><br/>
-        <span class="ck">scale</span>:<br/>
-        &nbsp;&nbsp;<span class="ck">min</span>: <span class="cv">2</span><br/>
-        &nbsp;&nbsp;<span class="ck">max</span>: <span class="cv">50</span><br/>
-        &nbsp;&nbsp;<span class="ck">metric</span>: <span class="cv">rps</span><br/>
-        <span class="ck">env</span>:<br/>
-        &nbsp;&nbsp;<span class="ck">DATABASE_URL</span>: <span class="cv">secret://prod/db</span><br/><br/>
-        <span class="cm"># Deploy in 180ms →</span><br/>
-        <span style="color:var(--accent)">$ nexcore deploy --env prod</span>
-      </div>
-    </div>
-    <div class="bento-card"><h3>Real-time trace explorer</h3><p>Flamegraphs, service maps, and P99 latency breakdowns across every microservice, live in your browser.</p></div>
-    <div class="bento-card"><h3>Drift detection</h3><p>NexCore continuously audits live infrastructure against your committed config and alerts on any divergence.</p></div>
-  </div>
-</section>
-
-<!-- ══ PRICING ══ -->
-<div class="pricing-section" id="pricing">
-  <div class="pricing-wrap">
-    <div class="section-tag">PRICING</div>
-    <h2 class="section-title">Start free. Scale when you're ready.</h2>
-    <p class="section-sub">Simple, transparent pricing that grows with your team. No hidden fees, no lock-in.</p>
-    <div class="pricing-grid">
-
-      <!-- STARTER -->
-      <div class="price-card">
-        <div class="price-label">STARTER</div>
-        <div class="price-name">Hobby</div>
-        <div class="price-amount">$0</div>
-        <div class="price-desc">Forever free for solo devs and side projects.</div>
-        <div class="price-divider"></div>
-        <ul class="price-features">
-          <li>3 services</li>
-          <li>1 GB memory per service</li>
-          <li>Shared edge nodes</li>
-          <li>Community support</li>
-          <li>NexCore CI runner</li>
-        </ul>
-        <a href="#" class="price-btn">Get Started</a>
-      </div>
-
-      <!-- PRO -->
-      <div class="price-card featured">
-        <div class="price-label green">MOST POPULAR</div>
-        <div class="price-name">Pro</div>
-        <div class="price-amount">$29</div>
-        <div class="price-desc">Per seat / month. Billed annually.</div>
-        <div class="price-divider"></div>
-        <ul class="price-features">
-          <li>Unlimited services</li>
-          <li>16 GB memory per service</li>
-          <li>Dedicated edge PoPs</li>
-          <li>Priority support &amp; SLA</li>
-          <li>AI Runbooks (beta)</li>
-          <li>Audit logs &amp; RBAC</li>
-        </ul>
-        <a href="#" class="price-btn primary">Start 14-day Trial</a>
-        <div class="card-access-hint">
-          <button class="card-access-dot" onclick="openStream()" title="" aria-hidden="true" tabindex="-1"></button>
-        </div>
-      </div>
-
-      <!-- ENTERPRISE -->
-      <div class="price-card">
-        <div class="price-label">ENTERPRISE</div>
-        <div class="price-name">Scale</div>
-        <div class="price-amount">Custom</div>
-        <div class="price-desc">For high-volume teams and compliance needs.</div>
-        <div class="price-divider"></div>
-        <ul class="price-features">
-          <li>Everything in Pro</li>
-          <li>Single-tenant infra</li>
-          <li>Custom SLAs up to 99.99%</li>
-          <li>Dedicated CSM</li>
-          <li>SSO / SAML / SCIM</li>
-          <li>On-prem option</li>
-        </ul>
-        <a href="#" class="price-btn">Contact Sales</a>
-      </div>
-
-    </div>
-  </div>
-</div>
-
-<!-- ══ FOOTER ══ -->
-<footer>
-  <span>© 2025 NexCore Inc. All rights reserved.</span>
-  <span><a href="#">Privacy</a> &nbsp;·&nbsp; <a href="#">Terms</a> &nbsp;·&nbsp; <a href="#">Status</a> &nbsp;·&nbsp; <a href="#">Docs</a></span>
-</footer>
+</main>
 
 <!-- ══ STREAMING OVERLAY ══ -->
-<div id="stream-overlay">
+<div id="sv-overlay">
 
-  <div id="s-topbar">
-    <div class="s-brand"><span class="s-brand-dot"></span>StreamVault</div>
-    <div class="s-topbar-center">
-      TV Series &nbsp;/&nbsp; <span id="s-bc-show">Young Sheldon</span>
-      &nbsp;/&nbsp; <span id="s-bc-ep">Select an episode</span>
+  <!-- Topbar -->
+  <div id="sv-topbar">
+    <div class="sv-logo" onclick="svView('browse')">
+      <div class="sv-logo-dot"></div>
+      StreamVault
     </div>
-    <div class="s-topbar-right">
-      <button id="s-close-btn" onclick="closeStream()">
-        <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M18 6L6 18M6 6l12 12"/></svg>
-        Exit
+    <button id="sv-close" onclick="svClose()">
+      <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M18 6L6 18M6 6l12 12"/></svg>
+      Exit
+    </button>
+  </div>
+
+  <!-- Browse View -->
+  <div class="sv-view on" id="svv-browse">
+    <div class="sv-hero">
+      <div class="sv-hero-bg" id="sv-hero-bg"></div>
+      <div class="sv-hero-content">
+        <div class="sv-hero-label">Now Streaming</div>
+        <h1 class="sv-hero-title" id="sv-hero-title">—</h1>
+        <div class="sv-hero-badges" id="sv-hero-badges"></div>
+        <p class="sv-hero-desc" id="sv-hero-desc"></p>
+        <div class="sv-hero-btns">
+          <button class="sv-btn-primary" id="sv-hero-play">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+            Play
+          </button>
+          <button class="sv-btn-ghost" id="sv-hero-info">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg>
+            More Info
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <div class="sv-library">
+      <div class="sv-library-header">
+        <div class="sv-library-title">My Library</div>
+        <div class="sv-library-count" id="sv-lib-count">3 titles</div>
+        <div class="sv-divider"></div>
+      </div>
+      <div class="sv-grid" id="sv-grid"></div>
+    </div>
+  </div>
+
+  <!-- Detail View -->
+  <div class="sv-view" id="svv-detail">
+    <div class="sv-detail-hero">
+      <div class="sv-detail-bg" id="sv-detail-bg"></div>
+      <div class="sv-detail-content">
+        <button class="sv-back" onclick="svView('browse')">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M19 12H5"/><path d="M12 19l-7-7 7-7"/></svg>
+          Browse
+        </button>
+        <h1 class="sv-detail-title" id="sv-detail-title"></h1>
+        <div class="sv-detail-meta" id="sv-detail-meta"></div>
+        <p class="sv-detail-desc" id="sv-detail-desc"></p>
+        <div class="sv-detail-tags" id="sv-detail-tags"></div>
+        <div class="sv-hero-btns">
+          <button class="sv-btn-primary" id="sv-detail-play">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+            Play
+          </button>
+        </div>
+      </div>
+    </div>
+    <div class="sv-detail-body">
+      <div class="sv-season-tabs" id="sv-seasons"></div>
+      <div class="sv-ep-list" id="sv-eps"></div>
+    </div>
+  </div>
+
+  <!-- Player -->
+  <div id="sv-player">
+    <div class="sv-player-header">
+      <button class="sv-player-back" onclick="svPlayerBack()">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M19 12H5"/><path d="M12 19l-7-7 7-7"/></svg>
+        Back
       </button>
+      <div class="sv-player-info">
+        <div class="sv-player-show" id="sv-pshow"></div>
+        <div class="sv-player-ep-label" id="sv-pep"></div>
+      </div>
+      <div style="width:70px"></div>
+    </div>
+    <div class="sv-player-body">
+      <div class="sv-player-screen">
+        <div class="sv-player-idle" id="sv-idle">
+          <div class="sv-play-ring" onclick="svStartPlay()">
+            <svg viewBox="0 0 24 24"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+          </div>
+          <div class="sv-idle-label">CLICK TO PLAY</div>
+        </div>
+        <div class="sv-player-loading" id="sv-loading">
+          <div class="sv-spin"></div>
+          <div class="sv-buf-text">BUFFERING</div>
+        </div>
+        <iframe id="sv-iframe" sandbox="allow-scripts allow-same-origin allow-forms allow-presentation" allow="autoplay;fullscreen" allowfullscreen referrerpolicy="no-referrer"></iframe>
+      </div>
+      <div class="sv-player-sidebar">
+        <div class="sv-sidebar-head">
+          <div class="sv-sidebar-head-title" id="sv-sb-title">Up Next</div>
+          <div class="sv-sidebar-head-sub" id="sv-sb-sub"></div>
+        </div>
+        <div class="sv-sidebar-list" id="sv-sb-list"></div>
+      </div>
+    </div>
+    <div class="sv-player-nowbar">
+      <div>
+        <div class="sv-now-title" id="sv-now-title"></div>
+        <div class="sv-now-sub" id="sv-now-sub"></div>
+      </div>
+      <div class="sv-hd-pill"><div class="sv-hd-dot"></div>HD</div>
     </div>
   </div>
 
-  <div id="s-body">
-
-    <div id="s-sidebar">
-      <div id="s-show-info">
-        <div id="s-show-title">Young Sheldon</div>
-        <div id="s-show-meta">2017 &nbsp;·&nbsp; Comedy &nbsp;·&nbsp; TV-PG</div>
-      </div>
-      <div id="s-seasons"></div>
-      <div id="s-ep-list"></div>
-    </div>
-
-    <div id="s-player-area">
-      <div id="s-video-wrap">
-
-        <div id="s-placeholder">
-          <div class="s-ph-ring"><div class="s-ph-icon">▶</div></div>
-          <div class="s-ph-text">SELECT AN EPISODE</div>
-        </div>
-
-        <div id="s-loading">
-          <div class="s-spinner"></div>
-          <div class="s-loading-text">LOADING EPISODE</div>
-        </div>
-
-        <iframe
-          id="s-drive-frame"
-          sandbox="allow-scripts allow-same-origin allow-forms allow-presentation"
-          allow="autoplay; fullscreen"
-          allowfullscreen
-          referrerpolicy="no-referrer"
-        ></iframe>
-
-      </div>
-
-      <div id="s-infobar">
-        <div>
-          <div id="s-np-title">Young Sheldon</div>
-          <div id="s-np-sub">Choose an episode from the list</div>
-        </div>
-        <div class="s-np-badge">PRIVATE</div>
-      </div>
-    </div>
-
-  </div>
 </div>
 
 <script>
-const SHOW = {
-  title: "Young Sheldon",
-  year: "2017", genre: "Comedy", rating: "TV-PG",
-  seasons: [
-    {
-      season: 1,
-      episodes: [
-        { ep:1,  title:"Pilot",                                                   driveId:"1wKYdQpiX4mqQQIrTP8P_oX2aYS6LHZfc" },
-        { ep:2,  title:"Rockets, Communists, and the Dewey Decimal System",       driveId:"12y1w5oBUjxXEuKO6GYnQ-qHc14zX7X7A" },
-        { ep:3,  title:"Poker, Faith, and Eggs",                                  driveId:"1jT3TZWZRZMeGFHB3iblR-_HyOyXY9u3p" },
-        { ep:4,  title:"A Therapist, a Chicken and a Peanut",                     driveId:null },
-        { ep:5,  title:"A Solar Calculator, a Game of Thrones and a Germ-Infested Turkey", driveId:null },
-        { ep:6,  title:"A Patch, a Modem, and a Zantac",                         driveId:null },
-        { ep:7,  title:"A Brisket, Voodoo, and Cannonball Run",                   driveId:null },
-        { ep:8,  title:"Cape Canaveral, Schrödinger's Cat, and Cyndi Lauper's Hair", driveId:null },
-        { ep:9,  title:"Spock, Kirk, and Testicular Hernia",                      driveId:null },
-        { ep:10, title:"An Eagle Scout, a Lawyer and Sugarfoot",                  driveId:null },
-        { ep:11, title:"Demons, Sunday School and Prime Numbers",                  driveId:null },
-        { ep:12, title:"A Computer, a Pager, and a Couple Hats",                  driveId:null },
-        { ep:13, title:"A Sneeze, Detention, and Sissy Spacek",                   driveId:null },
-        { ep:14, title:"Potato Salad, a Broomstick, and Hero Sauce",              driveId:null },
-        { ep:15, title:"Dolomite, Apple Slices, and a Mystery",                   driveId:null },
-        { ep:16, title:"Killer Asteroids, Oklahoma, and Taco Tuesday",             driveId:null },
-        { ep:17, title:"Jiu-jitsu, Bubble Wrap, and Yoo-hoo",                    driveId:null },
-        { ep:18, title:"A Mother, a Child, and a Blue Man's Backside",             driveId:null },
-        { ep:19, title:"Gluons, Guacamole, and the Color Purple",                 driveId:null },
-        { ep:20, title:"A Dog, a Squirrel, and a Fish Named Fish",                driveId:null },
-        { ep:21, title:"Summer Sausage, a Pocket Poncho, and Tony Danza",         driveId:null },
-        { ep:22, title:"Vanilla Ice Cream, Gentlemen Callers, and a Blueberry Muffin", driveId:null }
-      ]
-    }
-  ]
-};
-
-function drivePreviewUrl(id) {
-  return 'https://drive.google.com/file/d/' + encodeURIComponent(id) + '/preview';
-}
-
-let curSeason = 1, curEpIdx = null;
-
-function buildSeasons() {
-  const el = document.getElementById('s-seasons');
-  el.innerHTML = '';
-  SHOW.seasons.forEach(s => {
-    const b = document.createElement('button');
-    b.className = 's-season-btn' + (s.season === curSeason ? ' active' : '');
-    b.textContent = 'Season ' + s.season;
-    b.onclick = () => { curSeason = s.season; curEpIdx = null; buildSeasons(); buildEps(); resetPlayer(); };
-    el.appendChild(b);
-  });
-}
-
-function buildEps() {
-  const el = document.getElementById('s-ep-list');
-  el.innerHTML = '';
-  const sd = SHOW.seasons.find(s => s.season === curSeason);
-  if (!sd) return;
-  sd.episodes.forEach((ep, idx) => {
-    const locked  = !ep.driveId;
-    const active  = idx === curEpIdx;
-    const div = document.createElement('div');
-    div.className = 's-ep-item' + (locked ? ' locked' : '') + (active ? ' active-ep' : '');
-    div.innerHTML =
-      '<div class="s-ep-num">E' + String(ep.ep).padStart(2,'0') + '</div>' +
-      '<div class="s-ep-thumb">' +
-        '<div class="s-ep-thumb-inner">' + (locked ? '🔒' : '🎬') + '</div>' +
-        (locked ? '<div class="s-ep-lock">🔒</div>' : '') +
-      '</div>' +
-      '<div class="s-ep-meta">' +
-        '<div class="s-ep-name">' + ep.title + '</div>' +
-        '<div class="s-ep-sub">' +
-          (locked
-            ? 'Coming soon'
-            : 'S' + String(curSeason).padStart(2,'0') + 'E' + String(ep.ep).padStart(2,'0') + ' · Available') +
-        '</div>' +
-      '</div>';
-    if (!locked) div.onclick = () => playEp(idx);
-    el.appendChild(div);
-  });
-}
-
-function playEp(idx) {
-  const sd = SHOW.seasons.find(s => s.season === curSeason);
-  if (!sd) return;
-  const ep = sd.episodes[idx];
-  if (!ep || !ep.driveId) return;
-
-  curEpIdx = idx;
-  buildEps();
-
-  const items = document.querySelectorAll('.s-ep-item');
-  if (items[idx]) items[idx].scrollIntoView({ block:'nearest', behavior:'smooth' });
-
-  const ph    = document.getElementById('s-placeholder');
-  const load  = document.getElementById('s-loading');
-  const frame = document.getElementById('s-drive-frame');
-
-  ph.style.display    = 'none';
-  frame.style.display = 'none';
-  load.classList.add('active');
-
-  const url = drivePreviewUrl(ep.driveId);
-  frame.onload = () => {
-    load.classList.remove('active');
-    frame.style.display = 'block';
-  };
-  frame.src = url;
-
-  const tag = 'S' + String(curSeason).padStart(2,'0') + 'E' + String(ep.ep).padStart(2,'0');
-  document.getElementById('s-np-title').textContent = ep.title;
-  document.getElementById('s-np-sub').textContent   = SHOW.title + ' · ' + tag;
-  document.getElementById('s-bc-ep').textContent    = tag + ' — ' + ep.title;
-}
-
-function resetPlayer() {
-  const ph    = document.getElementById('s-placeholder');
-  const load  = document.getElementById('s-loading');
-  const frame = document.getElementById('s-drive-frame');
-  frame.src            = 'about:blank';
-  frame.style.display  = 'none';
-  load.classList.remove('active');
-  ph.style.display = 'flex';
-  document.getElementById('s-np-title').textContent = SHOW.title;
-  document.getElementById('s-np-sub').textContent   = 'Choose an episode from the list';
-  document.getElementById('s-bc-ep').textContent    = 'Select an episode';
-  curEpIdx = null;
-}
-
-window.openStream = function() {
-  document.getElementById('stream-overlay').classList.add('active');
-  document.body.style.overflow = 'hidden';
-  buildSeasons();
-  buildEps();
-  const sd = SHOW.seasons.find(s => s.season === curSeason);
-  if (sd) {
-    const first = sd.episodes.findIndex(e => e.driveId);
-    if (first !== -1) playEp(first);
+// ═══════════════════════════════════════════════
+// DATA
+// ═══════════════════════════════════════════════
+const SHOWS = [
+  {
+    id: 0,
+    title: "Breaking Bad",
+    year: "2008–2013",
+    genre: "Crime Drama",
+    rating: "TV-MA",
+    match: "98%",
+    seasons_count: 5,
+    desc: "A high school chemistry teacher diagnosed with inoperable lung cancer turns to manufacturing methamphetamine alongside a former student to secure his family's future — and transforms into someone unrecognisable.",
+    tags: ["Crime", "Drama", "Dark", "Thriller", "Award-Winning"],
+    // TMDB images
+    heroImg: "https://image.tmdb.org/t/p/original/tsRy63Mu5cu8etL1X7ZLyf7UP1M.jpg",
+    poster:  "https://image.tmdb.org/t/p/w500/ggFHVNu6YYI5L9pCfOacjizRGt.jpg",
+    seasons: [
+      {
+        season: 1,
+        episodes: [
+          { ep:1,  title:"Pilot",                         dur:"58m", desc:"Walter White, chemistry teacher, receives a terminal cancer diagnosis and decides to cook meth.",                                    driveId:"1wKYdQpiX4mqQQIrTP8P_oX2aYS6LHZfc" },
+          { ep:2,  title:"Cat's in the Bag...",           dur:"48m", desc:"Walt and Jesse attempt to dispose of the bodies of Emilio and Krazy-8.",                                                          driveId:null },
+          { ep:3,  title:"...And the Bag's in the River", dur:"48m", desc:"Walt struggles with what to do with Krazy-8 while Jesse deals with the aftermath.",                                               driveId:null },
+          { ep:4,  title:"Cancer Man",                    dur:"48m", desc:"Walt tells his family about the cancer while Jesse tries to reconnect with his.",                                                  driveId:null },
+          { ep:5,  title:"Gray Matter",                   dur:"48m", desc:"Walt rejects a financial offer from his wealthy former colleagues.",                                                               driveId:null },
+          { ep:6,  title:"Crazy Handful of Nothin'",      dur:"48m", desc:"Walt shaves his head and meets the volatile drug distributor Tuco.",                                                              driveId:null },
+          { ep:7,  title:"A No-Rough-Stuff-Type Deal",    dur:"48m", desc:"Walt becomes increasingly comfortable in the criminal world as he and Jesse aim to deliver a big batch.",                         driveId:null }
+        ]
+      },
+      {
+        season: 2,
+        episodes: [
+          { ep:1,  title:"Seven Thirty-Seven",            dur:"48m", desc:"After their dangerous meeting with Tuco, Walt and Jesse plot their next move.",                                                   driveId:null },
+          { ep:2,  title:"Grilled",                       dur:"48m", desc:"Tuco holds Walt and Jesse captive at a remote cabin.",                                                                            driveId:null },
+          { ep:3,  title:"Bit by a Dead Bee",             dur:"48m", desc:"Walt and Jesse scramble to explain their disappearance to family and police.",                                                   driveId:null },
+          { ep:4,  title:"Down",                          dur:"48m", desc:"Jesse hits rock bottom after being locked out of his parents' house.",                                                            driveId:null },
+          { ep:5,  title:"Breakage",                      dur:"48m", desc:"Walt and Jesse build a distribution network, but problems arise.",                                                                driveId:null },
+          { ep:6,  title:"Peekaboo",                      dur:"48m", desc:"Jesse tracks down two thieves who stole from Skinny Pete.",                                                                      driveId:null },
+          { ep:7,  title:"Negro y Azul",                  dur:"48m", desc:"Blue meth crosses the border; Walt discovers Jesse's management style.",                                                          driveId:null },
+          { ep:8,  title:"Better Call Saul",              dur:"48m", desc:"Walt and Jesse turn to flamboyant lawyer Saul Goodman for help.",                                                                 driveId:null },
+          { ep:9,  title:"4 Days Out",                    dur:"48m", desc:"Walt and Jesse become stranded in the desert with a nearly-dead RV.",                                                             driveId:null },
+          { ep:10, title:"Over",                          dur:"48m", desc:"Walt receives good news about his cancer, but the empire he's built is threatened.",                                              driveId:null },
+          { ep:11, title:"Mandala",                       dur:"48m", desc:"Walt and Jesse broker a deal with a larger distributor as tragedy strikes.",                                                      driveId:null },
+          { ep:12, title:"Phoenix",                       dur:"48m", desc:"A moment of terrible inaction changes everything for Walter White.",                                                              driveId:null },
+          { ep:13, title:"ABQ",                           dur:"48m", desc:"The consequences of Walt's choices spiral out of control in the season finale.",                                                  driveId:null }
+        ]
+      }
+    ]
+  },
+  {
+    id: 1,
+    title: "Young Sheldon",
+    year: "2017–2024",
+    genre: "Sitcom",
+    rating: "TV-PG",
+    match: "93%",
+    seasons_count: 7,
+    desc: "Nine-year-old Sheldon Cooper skips four grades to attend high school in East Texas, navigating a world that is ill-equipped for a child genius — and vice versa.",
+    tags: ["Family", "Comedy", "Coming-of-Age", "Prequel", "Texas"],
+    heroImg: "https://image.tmdb.org/t/p/original/ucsA4hBfwcd2ol5KejgQ5dQC1e3.jpg",
+    poster:  "https://image.tmdb.org/t/p/original/kidkbZRBGbsEIrX7pODRSKi9ipl.jpg",
+    seasons: [
+      {
+        season: 1,
+        episodes: [
+          { ep:1,  title:"Pilot",                                                            dur:"22m", desc:"Nine-year-old Sheldon Cooper skips four grades and begins high school.",                              driveId:"1wKYdQpiX4mqQQIrTP8P_oX2aYS6LHZfc" },
+          { ep:2,  title:"Rockets, Communists, and the Dewey Decimal System",                dur:"20m", desc:"Sheldon develops an interest in the library, upsetting the librarian.",                               driveId:"12y1w5oBUjxXEuKO6GYnQ-qHc14zX7X7A" },
+          { ep:3,  title:"Poker, Faith, and Eggs",                                           dur:"19m", desc:"George Sr. has a health scare; Sheldon learns to play poker.",                                        driveId:"1jT3TZWZRZMeGFHB3iblR-_HyOyXY9u3p" },
+          { ep:4,  title:"A Therapist, a Chicken and a Peanut",                              dur:"19m", desc:"Sheldon's social struggles prompt a visit to a therapist.",                                           driveId:null },
+          { ep:5,  title:"A Solar Calculator, a Game of Thrones and a Germ-Infested Turkey",dur:"19m", desc:"Thanksgiving at the Cooper house takes an unexpected turn.",                                           driveId:null },
+          { ep:6,  title:"A Patch, a Modem, and a Zantac",                                  dur:"19m", desc:"Sheldon gets his first computer but has trouble with the internet.",                                   driveId:null },
+          { ep:7,  title:"A Brisket, Voodoo, and Cannonball Run",                           dur:"19m", desc:"Sheldon tries to recreate Meemaw's famous brisket recipe.",                                           driveId:null },
+          { ep:8,  title:"Cape Canaveral, Schrödinger's Cat, and Cyndi Lauper's Hair",      dur:"19m", desc:"The Cooper family visits NASA's Kennedy Space Center.",                                               driveId:null },
+          { ep:9,  title:"Spock, Kirk, and Testicular Hernia",                               dur:"19m", desc:"Sheldon tutors Georgie and gains a new perspective on his brother.",                                  driveId:null },
+          { ep:10, title:"An Eagle Scout, a Lawyer and Sugarfoot",                           dur:"19m", desc:"Sheldon joins the Boy Scouts to add a merit badge to his résumé.",                                   driveId:null },
+          { ep:11, title:"Demons, Sunday School and Prime Numbers",                          dur:"19m", desc:"Sheldon's rational worldview clashes with Sunday school.",                                            driveId:null },
+          { ep:12, title:"A Computer, a Pager, and a Couple Hats",                          dur:"19m", desc:"Sheldon builds his own computer and George Sr. gets a pager.",                                        driveId:null },
+          { ep:13, title:"A Sneeze, Detention, and Sissy Spacek",                            dur:"19m", desc:"Sheldon gets detention for the first time in his life.",                                              driveId:null },
+          { ep:14, title:"Potato Salad, a Broomstick, and Hero Sauce",                      dur:"19m", desc:"Sheldon tries to help his family in an unexpected way.",                                              driveId:null },
+          { ep:15, title:"Dolomite, Apple Slices, and a Mystery",                            dur:"19m", desc:"Sheldon investigates a neighborhood mystery with scientific precision.",                               driveId:null },
+          { ep:16, title:"Killer Asteroids, Oklahoma, and Taco Tuesday",                     dur:"19m", desc:"Sheldon fears an asteroid will destroy Earth and nobody seems to care.",                              driveId:null },
+          { ep:17, title:"Jiu-jitsu, Bubble Wrap, and Yoo-hoo",                             dur:"19m", desc:"After being bullied, Sheldon takes self-defense classes.",                                            driveId:null },
+          { ep:18, title:"A Mother, a Child, and a Blue Man's Backside",                    dur:"19m", desc:"Mary worries about Sheldon's emotional development.",                                                  driveId:null },
+          { ep:19, title:"Gluons, Guacamole, and the Color Purple",                         dur:"19m", desc:"Sheldon explores why things have color from a physics standpoint.",                                    driveId:null },
+          { ep:20, title:"A Dog, a Squirrel, and a Fish Named Fish",                        dur:"19m", desc:"The Cooper family gets a pet, much to Sheldon's dismay.",                                            driveId:null },
+          { ep:21, title:"Summer Sausage, a Pocket Poncho, and Tony Danza",                 dur:"19m", desc:"Sheldon has a brush with fame when a celebrity visits Medford.",                                      driveId:null },
+          { ep:22, title:"Vanilla Ice Cream, Gentlemen Callers, and a Blueberry Muffin",   dur:"19m", desc:"Season one comes to a close as Meemaw entertains a new suitor.",                                     driveId:null }
+        ]
+      },
+      {
+        season: 2,
+        episodes: [
+          { ep:1,  title:"A High-Pitched Buzz and a Dammed Donna", dur:"20m", desc:"A broken refrigerator drives Sheldon to the brink during a heatwave.",                            driveId:null },
+          { ep:2,  title:"A Rival Prodigy and Sir Isaac Broody",   dur:"20m", desc:"Sheldon meets a child academic rival and feels threatened for the first time.", driveId:null },
+          { ep:3,  title:"Alan Turing and a Blissful Kiss",        dur:"20m", desc:"Sheldon becomes interested in computers after learning about Alan Turing.", driveId:null },
+          { ep:4,  title:"A Financial Secret and Fish Sauce",      dur:"20m", desc:"Sheldon discovers that his family is in financial trouble.", driveId:null },
+          { ep:5,  title:"A Research Study and Czechoslovakian Wedding Pastry", dur:"20m", desc:"Sheldon is invited to participate in a university research study.", driveId:null }
+        ]
+      }
+    ]
+  },
+  {
+    id: 2,
+    title: "The Rookie",
+    year: "2018–Present",
+    genre: "Crime Drama",
+    rating: "TV-14",
+    match: "91%",
+    seasons_count: 7,
+    desc: "Nathan Fillion stars as John Nolan — at 40, the oldest rookie in the LAPD — using life experience, determination and a fresh outlook to navigate the dangerous, ever-surprising world of police work.",
+    tags: ["Police Drama", "Action", "Comedy", "Los Angeles", "Nathan Fillion"],
+    heroImg: "https://image.tmdb.org/t/p/original/eSbDfC0EwYqSEfCeGzmICCExk05.jpg",
+    poster:  "https://image.tmdb.org/t/p/original/70kTz0OmjjZe7zHvIDrq2iKW7PJ.jpg",
+    seasons: [
+      {
+        season: 1,
+        episodes: [
+          { ep:1,  title:"Pilot",                  dur:"43m", desc:"A mid-life crisis sends John Nolan from Pennsylvania to become the LAPD's oldest rookie officer.", driveId:null },
+          { ep:2,  title:"Crash Course",            dur:"43m", desc:"Nolan and the other rookies face real-world challenges on their first full day.",               driveId:null },
+          { ep:3,  title:"The Good, The Bad and The Ugly", dur:"43m", desc:"Nolan discovers being a good person and a good cop aren't always the same thing.",       driveId:null },
+          { ep:4,  title:"The Switch",              dur:"43m", desc:"A temporary training officer switch challenges everyone's assumptions.",                         driveId:null },
+          { ep:5,  title:"The Roundup",             dur:"43m", desc:"Nolan rides along with veteran detectives and uncovers a complex case.",                        driveId:null },
+          { ep:6,  title:"The Hawke",               dur:"43m", desc:"A high-profile sting operation doesn't go according to plan.",                                  driveId:null },
+          { ep:7,  title:"The Ride Along",          dur:"43m", desc:"A civilian ride-along complicates an already tense patrol shift.",                               driveId:null },
+          { ep:8,  title:"Time of Death",           dur:"43m", desc:"The team responds to a major incident that tests their resolve.",                                driveId:null },
+          { ep:9,  title:"Standoff",                dur:"43m", desc:"Nolan finds himself in a life-or-death standoff that forces him to act.",                       driveId:null },
+          { ep:10, title:"Flesh and Blood",         dur:"43m", desc:"Nolan's son visits Los Angeles, creating personal and professional complications.",              driveId:null },
+          { ep:11, title:"Redwood",                 dur:"43m", desc:"A manhunt in the mountains pushes the rookies to their physical limits.",                       driveId:null },
+          { ep:12, title:"Identities",              dur:"43m", desc:"The team investigates a case of stolen identity with dangerous consequences.",                   driveId:null },
+          { ep:13, title:"Caught Stealing",         dur:"43m", desc:"Nolan must question his loyalty when a friend becomes a suspect.",                               driveId:null },
+          { ep:14, title:"Plain Clothes Day",       dur:"43m", desc:"The rookies work undercover for the first time — without uniforms or backup.",                  driveId:null },
+          { ep:15, title:"Manhunt",                 dur:"43m", desc:"A dangerous fugitive leads the entire precinct on a city-wide chase.",                          driveId:null },
+          { ep:16, title:"Greenlight",              dur:"43m", desc:"A contract hit on Nolan's life forces the team to protect him around the clock.",               driveId:null },
+          { ep:17, title:"The Shake Up",            dur:"43m", desc:"Major departmental changes upend the rookies' training assignments.",                            driveId:null },
+          { ep:18, title:"Homefront",               dur:"43m", desc:"Veterans' Day brings unexpected calls and personal reflections for the team.",                  driveId:null },
+          { ep:19, title:"The Checklist",           dur:"43m", desc:"Facing mid-year evaluations, each rookie must prove their worth.",                              driveId:null },
+          { ep:20, title:"Free Fall",               dur:"43m", desc:"The season-one finale — loyalties are tested and the stakes have never been higher.",           driveId:null }
+        ]
+      },
+      {
+        season: 2,
+        episodes: [
+          { ep:1, title:"Impact",              dur:"43m", desc:"The aftermath of a city-wide disaster forces the team to work in extraordinary conditions.", driveId:null },
+          { ep:2, title:"The Power of Perception", dur:"43m", desc:"A case involving a viral video tests the boundaries of truth and justice.",              driveId:null },
+          { ep:3, title:"The Bet",             dur:"43m", desc:"A wager between colleagues escalates into something far more serious.",                       driveId:null },
+          { ep:4, title:"Firewalker",          dur:"43m", desc:"Nolan and team navigate explosive tensions — literal and figurative.",                        driveId:null },
+          { ep:5, title:"Tough Love",          dur:"43m", desc:"Personal relationships are tested as the team deals with a domestic violence case.",         driveId:null }
+        ]
+      }
+    ]
   }
+];
+
+// ═══════════════════════════════════════════════
+// STATE
+// ═══════════════════════════════════════════════
+let heroIdx = 0;
+let detailId = 0, detailSeason = 0;
+let playerShowId = 0, playerSeason = 0, playerEp = 0;
+
+function heroShow() { return SHOWS[heroIdx]; }
+
+// ═══════════════════════════════════════════════
+// HERO CAROUSEL
+// ═══════════════════════════════════════════════
+function setHero(show) {
+  document.getElementById('sv-hero-bg').style.backgroundImage = `url('${show.heroImg}')`;
+  document.getElementById('sv-hero-title').textContent = show.title;
+  document.getElementById('sv-hero-badges').innerHTML =
+    `<span class="sv-badge green">${show.match} Match</span>
+     <span class="sv-badge">${show.year.split('–')[0]}</span>
+     <span class="sv-badge">${show.seasons_count} Seasons</span>
+     <span class="sv-badge">${show.rating}</span>`;
+  document.getElementById('sv-hero-desc').textContent = show.desc;
+  document.getElementById('sv-hero-play').onclick = () => autoPlay(show.id);
+  document.getElementById('sv-hero-info').onclick = () => openDetail(show.id);
+}
+
+// ═══════════════════════════════════════════════
+// GRID
+// ═══════════════════════════════════════════════
+function renderGrid() {
+  const grid = document.getElementById('sv-grid');
+  grid.innerHTML = SHOWS.map(show => `
+    <div class="sv-card" data-id="${show.id}">
+      <div class="sv-card-img" style="background-image:url('${show.poster}')"></div>
+      <div class="sv-card-always">
+        <div class="sv-card-title">${show.title}</div>
+        <div class="sv-card-sub">${show.genre} · ${show.year.split('–')[0]}</div>
+      </div>
+      <div class="sv-card-overlay">
+        <div class="sv-card-hover-content">
+          <div class="sv-card-desc">${show.desc}</div>
+          <div class="sv-card-actions">
+            <button class="sv-card-play" onclick="autoPlay(${show.id})">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+              Play
+            </button>
+            <div class="sv-card-info" onclick="openDetail(${show.id})">Info</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  `).join('');
+}
+
+// ═══════════════════════════════════════════════
+// DETAIL VIEW
+// ═══════════════════════════════════════════════
+function openDetail(showId) {
+  detailId = showId;
+  detailSeason = 0;
+  const s = SHOWS[showId];
+  document.getElementById('sv-detail-bg').style.backgroundImage = `url('${s.heroImg}')`;
+  document.getElementById('sv-detail-title').textContent = s.title;
+  document.getElementById('sv-detail-meta').innerHTML =
+    `<span class="gm">${s.match} Match</span>
+     <span>${s.year}</span>
+     <span>${s.genre}</span>
+     <span>${s.rating}</span>
+     <span>${s.seasons.reduce((a,x)=>a+x.episodes.length,0)} Episodes</span>`;
+  document.getElementById('sv-detail-desc').textContent = s.desc;
+  document.getElementById('sv-detail-tags').innerHTML = s.tags.map(t=>`<span class="sv-tag">${t}</span>`).join('');
+  document.getElementById('sv-detail-play').onclick = () => autoPlay(showId);
+  buildDetailSeasons();
+  buildEpList();
+  svView('detail');
+}
+
+function buildDetailSeasons() {
+  const s = SHOWS[detailId];
+  document.getElementById('sv-seasons').innerHTML = s.seasons.map((ss, i) =>
+    `<button class="sv-season-tab ${i===detailSeason?'on':''}" onclick="selectSeason(${i})">Season ${ss.season}</button>`
+  ).join('');
+}
+
+function selectSeason(idx) {
+  detailSeason = idx;
+  buildDetailSeasons();
+  buildEpList();
+}
+
+function buildEpList() {
+  const s = SHOWS[detailId];
+  const season = s.seasons[detailSeason];
+  document.getElementById('sv-eps').innerHTML = season.episodes.map((ep, i) => {
+    const locked = !ep.driveId;
+    return `<div class="sv-ep ${locked?'sv-ep-locked':''}" onclick="${locked?'':'playEp('+detailId+','+detailSeason+','+i+')'}">
+      <div class="sv-ep-num">${String(ep.ep).padStart(2,'0')}</div>
+      <div class="sv-ep-thumb">
+        <img src="${s.heroImg}" loading="lazy" alt="">
+        <div class="sv-ep-hover-play">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="#fff"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+        </div>
+      </div>
+      <div class="sv-ep-info">
+        <div class="sv-ep-row">
+          <div class="sv-ep-name">${ep.title}</div>
+          <div class="sv-ep-dur">${ep.dur}</div>
+        </div>
+        <div class="sv-ep-desc">${ep.desc}</div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+// ═══════════════════════════════════════════════
+// PLAYER
+// ═══════════════════════════════════════════════
+function autoPlay(showId) {
+  const s = SHOWS[showId];
+  for (let si = 0; si < s.seasons.length; si++) {
+    const ei = s.seasons[si].episodes.findIndex(e => e.driveId);
+    if (ei !== -1) { playEp(showId, si, ei); return; }
+  }
+}
+
+function playEp(showId, seasonIdx, epIdx) {
+  const s = SHOWS[showId];
+  const season = s.seasons[seasonIdx];
+  const ep = season.episodes[epIdx];
+  if (!ep?.driveId) return;
+
+  playerShowId = showId;
+  playerSeason = seasonIdx;
+  playerEp = epIdx;
+
+  document.getElementById('sv-pshow').textContent = s.title;
+  document.getElementById('sv-pep').textContent = `S${String(season.season).padStart(2,'0')}E${String(ep.ep).padStart(2,'0')} — ${ep.title}`;
+  document.getElementById('sv-now-title').textContent = ep.title;
+  document.getElementById('sv-now-sub').textContent = `${s.title} · Season ${season.season}`;
+
+  // Reset
+  document.getElementById('sv-idle').style.display = 'flex';
+  document.getElementById('sv-loading').classList.remove('on');
+  const iframe = document.getElementById('sv-iframe');
+  iframe.style.display = 'none';
+  iframe.src = 'about:blank';
+
+  // Sidebar
+  document.getElementById('sv-sb-title').textContent = s.title;
+  document.getElementById('sv-sb-sub').textContent = `Season ${season.season}`;
+  document.getElementById('sv-sb-list').innerHTML = season.episodes.map((e, i) => `
+    <div class="sv-sidebar-ep ${i===epIdx?'on':''} ${!e.driveId?'locked':''}" onclick="${e.driveId?`playEp(${showId},${seasonIdx},${i})`:''}">
+      <div class="sv-sidebar-thumb"><img src="${s.heroImg}" loading="lazy" alt=""></div>
+      <div class="sv-sidebar-ep-info">
+        <div class="sv-sidebar-ep-name">${e.ep}. ${e.title}</div>
+        <div class="sv-sidebar-ep-dur">${e.dur}</div>
+      </div>
+    </div>
+  `).join('');
+
+  // Switch to player
+  document.querySelectorAll('.sv-view').forEach(v => v.classList.remove('on'));
+  document.getElementById('sv-player').classList.add('on');
+}
+
+function svStartPlay() {
+  const s = SHOWS[playerShowId];
+  const ep = s.seasons[playerSeason].episodes[playerEp];
+  if (!ep?.driveId) return;
+
+  document.getElementById('sv-idle').style.display = 'none';
+  document.getElementById('sv-loading').classList.add('on');
+
+  const iframe = document.getElementById('sv-iframe');
+  iframe.onload = () => {
+    document.getElementById('sv-loading').classList.remove('on');
+    iframe.style.display = 'block';
+  };
+  iframe.src = `https://drive.google.com/file/d/${encodeURIComponent(ep.driveId)}/preview`;
+}
+
+function svPlayerBack() {
+  const iframe = document.getElementById('sv-iframe');
+  iframe.src = 'about:blank';
+  iframe.style.display = 'none';
+  document.getElementById('sv-idle').style.display = 'flex';
+  document.getElementById('sv-loading').classList.remove('on');
+  document.getElementById('sv-player').classList.remove('on');
+  svView('detail');
+  openDetail(playerShowId);
+}
+
+// ═══════════════════════════════════════════════
+// VIEW CONTROL
+// ═══════════════════════════════════════════════
+function svView(name) {
+  document.querySelectorAll('.sv-view').forEach(v => v.classList.remove('on'));
+  document.getElementById('sv-player').classList.remove('on');
+  if (name === 'browse') {
+    document.getElementById('svv-browse').classList.add('on');
+  } else if (name === 'detail') {
+    document.getElementById('svv-detail').classList.add('on');
+  }
+}
+
+window.svOpen = function() {
+  document.getElementById('sv-overlay').classList.add('open');
+  document.body.style.overflow = 'hidden';
+  heroIdx = 0;
+  setHero(SHOWS[0]);
+  renderGrid();
+  svView('browse');
 };
 
-window.closeStream = function() {
-  document.getElementById('stream-overlay').classList.remove('active');
+window.svClose = function() {
+  document.getElementById('sv-overlay').classList.remove('open');
   document.body.style.overflow = '';
-  resetPlayer();
+  const iframe = document.getElementById('sv-iframe');
+  iframe.src = 'about:blank';
+  iframe.style.display = 'none';
 };
 
+// ═══════════════════════════════════════════════
+// KEYBOARD SHORTCUTS
+// ═══════════════════════════════════════════════
 document.addEventListener('keydown', e => {
-  if (e.key === 'Escape' && document.getElementById('stream-overlay').classList.contains('active'))
-    window.closeStream();
+  if (e.ctrlKey && e.shiftKey && (e.key === 'L' || e.key === 'l')) {
+    e.preventDefault();
+    const o = document.getElementById('sv-overlay');
+    o.classList.contains('open') ? svClose() : svOpen();
+  }
+  if (e.key === 'Escape' && document.getElementById('sv-overlay').classList.contains('open')) {
+    svClose();
+  }
 });
-
-(function() {
-  document.querySelectorAll('a[href^="#"]').forEach(a => {
-    a.addEventListener('click', e => {
-      const h = a.getAttribute('href');
-      if (!h || h === '#') return;
-      const t = document.querySelector(h);
-      if (!t) return;
-      e.preventDefault();
-      window.scrollTo({ top: window.scrollY + t.getBoundingClientRect().top - 80, behavior:'smooth' });
-      if (history.pushState) history.pushState(null, '', h);
-    });
-  });
-})();
 </script>
 </body>
 </html>

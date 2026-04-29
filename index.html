@@ -1,303 +1,790 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Journal of Digital Forensic Methodologies | Vol. 14, Issue 3</title>
-  <meta name="description" content="A comprehensive peer-reviewed examination of modern PC forensic analysis techniques." />
-  <meta name="theme-color" content="#f5f5f0">
-  <link href="https://fonts.googleapis.com/css2?family=Merriweather:ital,wght@0,300;0,400;0,700;1,300;1,400&family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
-  <style>
-    :root {
-      --paper:#f5f5f0;--paper-dark:#ebebe5;--ink:#2a2a2a;--ink-light:#555;--ink-muted:#777;--border:#d4d4cc;--accent:#8b4513;--radius:4px;
-    }
-    *{box-sizing:border-box;margin:0;padding:0}
-    body{font-family:'Merriweather',Georgia,serif;background:var(--paper);color:var(--ink);line-height:1.75;font-size:15.5px;-webkit-font-smoothing:antialiased;overflow-x:hidden}
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Journal of Digital Forensic Methodologies | Vol. 14, Issue 3</title>
+<meta name="description" content="A comprehensive peer-reviewed examination of modern PC forensic analysis techniques, NTFS vs ReFS artifact recovery, and implications for enterprise digital investigations."/>
+<meta name="theme-color" content="#f7f6f1"/>
+<link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:ital,opsz,wght@0,8..60,300;0,8..60,400;0,8..60,600;0,8..60,700;1,8..60,300;1,8..60,400&family=IBM+Plex+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+<style>
+:root{
+  --paper:#f7f6f1;--paper-dark:#eeede7;--ink:#1e1e1e;--ink-mid:#444;--ink-light:#666;--ink-muted:#888;
+  --border:#d0cfca;--border-light:#e4e3de;--accent:#7b3f10;--accent2:#1a5c8a;--red:#c0392b;
+  --sidebar:280px;--max:1140px;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{font-family:'Source Serif 4',Georgia,serif;background:var(--paper);color:var(--ink);line-height:1.8;font-size:16px;-webkit-font-smoothing:antialiased;overflow-x:hidden}
+a{color:var(--accent2);text-decoration:none}
+a:hover{text-decoration:underline}
 
-    .journal-header{background:#fff;border-bottom:3px double var(--border);padding:28px 24px;text-align:center}
-    .journal-title{font-family:'Inter',sans-serif;font-size:1.05rem;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--ink-light);margin-bottom:6px}
-    .journal-name{font-family:'Merriweather',serif;font-size:1.9rem;font-weight:700;color:var(--ink);margin-bottom:8px}
-    .journal-meta{font-family:'Inter',sans-serif;font-size:.78rem;color:var(--ink-muted);letter-spacing:.04em}
-    .journal-meta span{margin:0 10px}
-    .journal-nav{display:flex;justify-content:center;gap:32px;margin-top:18px;padding-top:14px;border-top:1px solid var(--border);font-family:'Inter',sans-serif;font-size:.8rem;font-weight:500}
-    .journal-nav a{color:var(--ink-light);text-decoration:none}
-    .article-wrap{max-width:780px;margin:0 auto;padding:48px 24px 80px}
-    .article-header{margin-bottom:36px;padding-bottom:28px;border-bottom:1px solid var(--border)}
-    .article-type{font-family:'Inter',sans-serif;font-size:.72rem;font-weight:600;letter-spacing:.15em;text-transform:uppercase;color:var(--accent);margin-bottom:12px}
-    .article-title{font-size:1.85rem;font-weight:700;line-height:1.35;color:var(--ink);margin-bottom:16px}
-    .article-authors{font-family:'Inter',sans-serif;font-size:.88rem;color:var(--ink-light);margin-bottom:8px}
-    .article-affil{font-family:'Inter',sans-serif;font-size:.78rem;color:var(--ink-muted);font-style:italic;margin-bottom:16px}
-    .article-dates{font-family:'Inter',sans-serif;font-size:.72rem;color:var(--ink-muted)}
-    .article-dates span{margin-right:16px}
-    .abstract-box{background:#fff;border:1px solid var(--border);border-radius:4px;padding:24px 28px;margin-bottom:36px}
-    .abstract-label{font-family:'Inter',sans-serif;font-size:.72rem;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--ink-light);margin-bottom:10px}
-    .abstract-text{font-size:.95rem;color:var(--ink-light);line-height:1.8;font-style:italic}
-    .keywords{margin-top:14px;font-family:'Inter',sans-serif;font-size:.75rem;color:var(--ink-muted)}
-    .article-body h2{font-family:'Inter',sans-serif;font-size:1.15rem;font-weight:700;color:var(--ink);margin:36px 0 14px}
-    .article-body p{margin-bottom:16px;text-align:justify;hyphens:auto}
-    .footer-note{text-align:center;margin-top:48px;padding-top:24px;border-top:1px solid var(--border);font-family:'Inter',sans-serif;font-size:.72rem;color:var(--ink-muted);line-height:1.8}
+/* ─── TOP NOTICE BAR ─── */
+.notice-bar{background:#1a5c8a;color:#fff;text-align:center;padding:9px 20px;font-family:'IBM Plex Sans',sans-serif;font-size:.75rem;letter-spacing:.03em}
+.notice-bar a{color:#a8d4f0;text-decoration:underline}
 
-    /* ═══════════════════════════════════════
-       STREAMING OVERLAY
-    ═══════════════════════════════════════ */
-    #sv-overlay{
-      display:none;position:fixed;inset:0;z-index:9999;
-      background:#0a0a0e;flex-direction:column;overflow:hidden;
-    }
-    #sv-overlay.open{display:flex;animation:fadeIn .35s ease both}
-    @keyframes fadeIn{from{opacity:0}to{opacity:1}}
+/* ─── HEADER ─── */
+.site-header{background:#fff;border-bottom:1px solid var(--border)}
+.header-top{display:flex;align-items:center;justify-content:space-between;max-width:var(--max);margin:0 auto;padding:14px 24px}
+.header-logo-group{display:flex;align-items:center;gap:14px}
+.header-logo-mark{width:44px;height:44px;border:2px solid var(--accent);display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.header-logo-mark span{font-family:'IBM Plex Sans',sans-serif;font-weight:700;font-size:.95rem;color:var(--accent);letter-spacing:.05em}
+.header-pub-name{font-family:'IBM Plex Sans',sans-serif}
+.header-pub-name strong{display:block;font-size:1.05rem;font-weight:700;color:var(--ink);letter-spacing:-.01em}
+.header-pub-name small{font-size:.72rem;color:var(--ink-muted);letter-spacing:.04em}
+.header-actions{display:flex;align-items:center;gap:10px}
+.btn-sub{background:var(--accent);color:#fff;border:none;padding:8px 18px;font-family:'IBM Plex Sans',sans-serif;font-size:.78rem;font-weight:600;cursor:pointer;border-radius:3px}
+.btn-login{background:transparent;border:1px solid var(--border);padding:8px 16px;font-family:'IBM Plex Sans',sans-serif;font-size:.78rem;color:var(--ink-mid);cursor:pointer;border-radius:3px}
+.header-nav{border-top:1px solid var(--border-light);background:#fff}
+.header-nav ul{display:flex;gap:0;max-width:var(--max);margin:0 auto;padding:0 24px;list-style:none}
+.header-nav ul li a{display:block;padding:11px 16px;font-family:'IBM Plex Sans',sans-serif;font-size:.8rem;font-weight:500;color:var(--ink-mid);border-bottom:2px solid transparent;transition:color .15s,border-color .15s}
+.header-nav ul li a:hover{color:var(--accent);border-color:var(--accent);text-decoration:none}
+.header-nav ul li a.active{color:var(--accent);border-color:var(--accent)}
 
-    #sv-topbar{
-      flex-shrink:0;height:64px;
-      display:flex;align-items:center;justify-content:space-between;
-      padding:0 40px;
-      background:linear-gradient(180deg,rgba(10,10,14,1) 0%,rgba(10,10,14,0) 100%);
-      position:relative;z-index:50;
-    }
-    .sv-logo{font-family:'Inter',sans-serif;font-weight:900;font-size:1.3rem;letter-spacing:-.04em;color:#fff;display:flex;align-items:center;gap:10px;cursor:pointer}
-    .sv-logo-dot{width:10px;height:10px;border-radius:50%;background:linear-gradient(135deg,#e63946,#c1121f);box-shadow:0 0 12px rgba(230,57,70,.7)}
-    #sv-close{display:flex;align-items:center;gap:7px;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.1);border-radius:999px;padding:7px 18px;color:rgba(255,255,255,.55);font-family:'Inter',sans-serif;font-size:.78rem;cursor:pointer;transition:all .2s}
-    #sv-close:hover{background:rgba(255,255,255,.14);color:#fff}
+/* ─── BREADCRUMB ─── */
+.breadcrumb{max-width:var(--max);margin:0 auto;padding:12px 24px;font-family:'IBM Plex Sans',sans-serif;font-size:.74rem;color:var(--ink-muted)}
+.breadcrumb span{margin:0 6px;color:var(--border)}
 
-    .sv-view{display:none;flex:1;overflow-y:auto;overflow-x:hidden}
-    .sv-view.on{display:block}
-    .sv-view::-webkit-scrollbar{width:5px}
-    .sv-view::-webkit-scrollbar-thumb{background:rgba(255,255,255,.08);border-radius:3px}
+/* ─── LAYOUT ─── */
+.page-layout{max-width:var(--max);margin:0 auto;padding:0 24px 80px;display:grid;grid-template-columns:1fr var(--sidebar);gap:48px;align-items:start}
+.article-col{min-width:0}
+.sidebar-col{position:sticky;top:20px}
 
-    .sv-hero{position:relative;height:90vh;min-height:520px;max-height:700px;display:flex;align-items:flex-end;padding:0 60px 60px;overflow:hidden}
-    .sv-hero-bg{position:absolute;inset:0;background-size:cover;background-position:center 20%}
-    .sv-hero-bg::after{content:'';position:absolute;inset:0;background:linear-gradient(to top,rgba(10,10,14,1) 0%,rgba(10,10,14,.75) 35%,rgba(10,10,14,.2) 70%,rgba(10,10,14,.05) 100%)}
-    .sv-hero-content{position:relative;z-index:2;max-width:620px}
-    .sv-hero-label{display:inline-flex;align-items:center;gap:8px;font-family:'Inter',sans-serif;font-size:.68rem;font-weight:700;letter-spacing:.18em;text-transform:uppercase;color:#e63946;margin-bottom:16px}
-    .sv-hero-label::before{content:'';width:18px;height:2px;background:#e63946;border-radius:2px}
-    .sv-hero-title{font-family:'Inter',sans-serif;font-size:3.8rem;font-weight:900;color:#fff;line-height:1;letter-spacing:-.04em;margin-bottom:16px;text-shadow:0 2px 40px rgba(0,0,0,.6)}
-    .sv-hero-badges{display:flex;align-items:center;gap:10px;margin-bottom:18px;flex-wrap:wrap}
-    .sv-badge{font-family:'Inter',sans-serif;font-size:.72rem;font-weight:600;padding:4px 10px;border-radius:4px;background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.15);color:rgba(255,255,255,.75)}
-    .sv-badge.green{background:rgba(70,211,105,.1);border-color:rgba(70,211,105,.2);color:#46d369}
-    .sv-hero-desc{font-family:'Inter',sans-serif;font-size:.95rem;font-weight:400;color:rgba(255,255,255,.65);line-height:1.65;margin-bottom:28px;max-width:500px}
-    .sv-hero-btns{display:flex;gap:12px}
-    .sv-btn-primary{display:inline-flex;align-items:center;gap:9px;background:#e63946;color:#fff;padding:12px 28px;border-radius:6px;font-family:'Inter',sans-serif;font-size:.9rem;font-weight:700;border:none;cursor:pointer;transition:all .2s;box-shadow:0 4px 20px rgba(230,57,70,.4)}
-    .sv-btn-primary:hover{background:#c1121f;transform:translateY(-1px)}
-    .sv-btn-ghost{display:inline-flex;align-items:center;gap:9px;background:rgba(255,255,255,.1);color:#fff;padding:12px 24px;border-radius:6px;font-family:'Inter',sans-serif;font-size:.9rem;font-weight:600;border:1px solid rgba(255,255,255,.15);cursor:pointer;transition:all .2s}
-    .sv-btn-ghost:hover{background:rgba(255,255,255,.18)}
+/* ─── ARTICLE HEADER ─── */
+.article-header{border-bottom:2px solid var(--border);padding-bottom:28px;margin-bottom:32px}
+.art-type-badge{display:inline-flex;align-items:center;gap:6px;background:var(--accent);color:#fff;font-family:'IBM Plex Sans',sans-serif;font-size:.68rem;font-weight:700;letter-spacing:.12em;text-transform:uppercase;padding:4px 10px;border-radius:2px;margin-bottom:14px}
+.art-section-tag{display:inline-block;border:1px solid var(--border);color:var(--ink-light);font-family:'IBM Plex Sans',sans-serif;font-size:.68rem;padding:3px 9px;border-radius:2px;margin-left:8px;margin-bottom:14px}
+h1.art-title{font-size:1.85rem;font-weight:700;line-height:1.3;color:var(--ink);margin-bottom:18px;letter-spacing:-.02em}
+.art-authors{font-family:'IBM Plex Sans',sans-serif;font-size:.9rem;margin-bottom:4px}
+.art-authors a{color:var(--accent2);font-weight:500}
+.art-authors sup{color:var(--ink-muted);font-size:.65rem}
+.art-affiliations{font-family:'IBM Plex Sans',sans-serif;font-size:.78rem;color:var(--ink-muted);font-style:italic;margin-bottom:14px;line-height:1.7}
+.art-dates{font-family:'IBM Plex Sans',sans-serif;font-size:.74rem;color:var(--ink-muted);display:flex;gap:20px;flex-wrap:wrap;margin-bottom:14px}
+.art-doi{font-family:'IBM Plex Mono',monospace;font-size:.74rem;color:var(--ink-light);margin-bottom:12px}
+.art-doi a{color:var(--accent2)}
+.art-metrics-row{display:flex;gap:24px;flex-wrap:wrap;margin-top:18px;padding-top:18px;border-top:1px solid var(--border-light)}
+.art-metric{text-align:center}
+.art-metric-num{font-family:'IBM Plex Sans',sans-serif;font-size:1.2rem;font-weight:700;color:var(--ink);display:block}
+.art-metric-label{font-family:'IBM Plex Sans',sans-serif;font-size:.67rem;color:var(--ink-muted);text-transform:uppercase;letter-spacing:.08em}
 
-    .sv-library{padding:0 60px 60px}
-    .sv-library-header{display:flex;align-items:center;gap:14px;margin-bottom:28px;padding-top:40px}
-    .sv-library-title{font-family:'Inter',sans-serif;font-size:1.1rem;font-weight:700;color:rgba(255,255,255,.9)}
-    .sv-library-count{font-family:'Inter',sans-serif;font-size:.78rem;color:rgba(255,255,255,.3)}
-    .sv-divider{flex:1;height:1px;background:rgba(255,255,255,.06)}
-    .sv-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:20px}
-    .sv-card{position:relative;border-radius:10px;overflow:hidden;cursor:pointer;background:#141418;transition:transform .3s cubic-bezier(.2,0,.2,1),box-shadow .3s;aspect-ratio:2/3}
-    .sv-card:hover{transform:translateY(-6px) scale(1.02);box-shadow:0 20px 50px rgba(0,0,0,.7)}
-    .sv-card-img{position:absolute;inset:0;background-size:cover;background-position:center;transition:transform .5s ease}
-    .sv-card:hover .sv-card-img{transform:scale(1.06)}
-    .sv-card-overlay{position:absolute;inset:0;background:linear-gradient(to top,rgba(10,10,14,.95) 0%,rgba(10,10,14,.4) 45%,transparent 100%);display:flex;flex-direction:column;justify-content:flex-end;padding:20px;opacity:0;transition:opacity .3s}
-    .sv-card:hover .sv-card-overlay{opacity:1}
-    .sv-card-always{position:absolute;inset:0;background:linear-gradient(to top,rgba(10,10,14,.85) 0%,transparent 50%);display:flex;flex-direction:column;justify-content:flex-end;padding:18px}
-    .sv-card-title{font-family:'Inter',sans-serif;font-size:1.05rem;font-weight:800;color:#fff;margin-bottom:4px;letter-spacing:-.02em}
-    .sv-card-sub{font-family:'Inter',sans-serif;font-size:.72rem;color:rgba(255,255,255,.5)}
-    .sv-card-hover-content{position:absolute;bottom:0;left:0;right:0;padding:18px}
-    .sv-card-desc{font-family:'Inter',sans-serif;font-size:.78rem;color:rgba(255,255,255,.65);line-height:1.5;margin-bottom:14px;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
-    .sv-card-actions{display:flex;gap:8px}
-    .sv-card-play{flex:1;display:flex;align-items:center;justify-content:center;gap:6px;background:#e63946;color:#fff;border:none;border-radius:5px;font-family:'Inter',sans-serif;font-size:.78rem;font-weight:700;padding:8px 0;cursor:pointer;transition:background .2s}
-    .sv-card-play:hover{background:#c1121f}
-    .sv-card-info{display:flex;align-items:center;justify-content:center;background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.15);border-radius:5px;padding:8px 14px;color:#fff;font-size:.78rem;font-family:'Inter',sans-serif;font-weight:600;cursor:pointer;transition:background .2s;white-space:nowrap}
-    .sv-card-info:hover{background:rgba(255,255,255,.2)}
+/* ─── ABSTRACT ─── */
+.abstract-section{background:#fff;border:1px solid var(--border);border-left:4px solid var(--accent);padding:22px 26px;margin-bottom:32px}
+.abstract-section h2{font-family:'IBM Plex Sans',sans-serif;font-size:.72rem;font-weight:700;letter-spacing:.15em;text-transform:uppercase;color:var(--ink-muted);margin-bottom:10px}
+.abstract-section p{font-size:.96rem;color:var(--ink-mid);line-height:1.85;font-style:italic}
+.keywords{margin-top:14px;font-family:'IBM Plex Sans',sans-serif;font-size:.76rem;color:var(--ink-light)}
+.keywords strong{color:var(--ink-mid)}
+.kw{display:inline-block;background:var(--paper-dark);border:1px solid var(--border-light);padding:2px 9px;border-radius:2px;margin:3px 3px 0 0;font-size:.71rem}
 
-    .sv-detail-hero{position:relative;height:55vh;min-height:360px;display:flex;align-items:flex-end;padding:0 60px 40px;overflow:hidden}
-    .sv-detail-bg{position:absolute;inset:0;background-size:cover;background-position:center 15%}
-    .sv-detail-bg::after{content:'';position:absolute;inset:0;background:linear-gradient(to top,rgba(10,10,14,1) 0%,rgba(10,10,14,.7) 40%,rgba(10,10,14,.2) 100%)}
-    .sv-detail-content{position:relative;z-index:2;max-width:700px}
-    .sv-back{display:inline-flex;align-items:center;gap:7px;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.1);border-radius:999px;padding:7px 16px;color:rgba(255,255,255,.65);font-family:'Inter',sans-serif;font-size:.78rem;cursor:pointer;transition:all .2s;margin-bottom:20px}
-    .sv-back:hover{background:rgba(255,255,255,.15);color:#fff}
-    .sv-detail-title{font-family:'Inter',sans-serif;font-size:2.8rem;font-weight:900;color:#fff;letter-spacing:-.03em;margin-bottom:12px}
-    .sv-detail-meta{display:flex;align-items:center;gap:12px;font-family:'Inter',sans-serif;font-size:.82rem;color:rgba(255,255,255,.55);margin-bottom:14px;flex-wrap:wrap}
-    .sv-detail-meta .gm{color:#46d369;font-weight:700}
-    .sv-detail-desc{font-family:'Inter',sans-serif;font-size:.9rem;color:rgba(255,255,255,.6);line-height:1.7;max-width:560px;margin-bottom:22px}
-    .sv-detail-tags{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:24px}
-    .sv-tag{background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.1);border-radius:999px;padding:4px 13px;font-family:'Inter',sans-serif;font-size:.7rem;color:rgba(255,255,255,.5)}
-    .sv-detail-body{padding:0 60px 60px;background:#0a0a0e}
-    .sv-season-tabs{display:flex;gap:8px;margin-bottom:28px;padding-top:8px}
-    .sv-season-tab{padding:8px 20px;border-radius:999px;font-family:'Inter',sans-serif;font-size:.82rem;font-weight:600;cursor:pointer;border:1px solid rgba(255,255,255,.1);background:rgba(255,255,255,.04);color:rgba(255,255,255,.45);transition:all .2s}
-    .sv-season-tab:hover{color:rgba(255,255,255,.8);border-color:rgba(255,255,255,.2)}
-    .sv-season-tab.on{background:#e63946;border-color:#e63946;color:#fff;box-shadow:0 0 18px rgba(230,57,70,.3)}
+/* ─── ARTICLE BODY ─── */
+.article-body{font-size:1rem}
+.article-body h2{font-family:'IBM Plex Sans',sans-serif;font-size:1.15rem;font-weight:700;color:var(--ink);margin:40px 0 14px;padding-top:8px;border-top:1px solid var(--border-light)}
+.article-body h3{font-family:'IBM Plex Sans',sans-serif;font-size:1rem;font-weight:600;color:var(--ink);margin:26px 0 10px}
+.article-body p{margin-bottom:18px;text-align:justify;hyphens:auto;color:var(--ink-mid)}
+.article-body ul,.article-body ol{margin:0 0 18px 24px;color:var(--ink-mid)}
+.article-body li{margin-bottom:6px}
+.article-body figure{margin:28px 0;background:#fff;border:1px solid var(--border);padding:18px}
+.article-body figure img{width:100%;display:block}
+.article-body figcaption{font-family:'IBM Plex Sans',sans-serif;font-size:.78rem;color:var(--ink-muted);margin-top:10px;line-height:1.65}
+.article-body figcaption strong{color:var(--ink-light)}
 
-    .sv-ep-list{max-width:860px}
-    .sv-ep{display:flex;align-items:center;gap:16px;padding:12px 14px;border-radius:8px;cursor:pointer;transition:background .18s;border:1px solid transparent;margin-bottom:4px}
-    .sv-ep:hover:not(.sv-ep-locked){background:rgba(255,255,255,.04);border-color:rgba(255,255,255,.05)}
-    .sv-ep.sv-ep-locked{opacity:.22;cursor:default}
-    .sv-ep-num{font-family:'Inter',sans-serif;font-size:1.25rem;font-weight:900;color:rgba(255,255,255,.1);width:34px;text-align:center;flex-shrink:0}
-    .sv-ep-thumb{width:116px;height:66px;border-radius:6px;background:#1a1a22;flex-shrink:0;overflow:hidden;position:relative}
-    .sv-ep-thumb img{width:100%;height:100%;object-fit:cover}
-    .sv-ep-hover-play{position:absolute;inset:0;background:rgba(0,0,0,.5);display:flex;align-items:center;justify-content:center;opacity:0;transition:opacity .2s}
-    .sv-ep:hover:not(.sv-ep-locked) .sv-ep-hover-play{opacity:1}
-    .sv-ep-info{flex:1;min-width:0}
-    .sv-ep-row{display:flex;justify-content:space-between;align-items:center;margin-bottom:4px}
-    .sv-ep-name{font-family:'Inter',sans-serif;font-size:.9rem;font-weight:700;color:rgba(255,255,255,.82);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-    .sv-ep-dur{font-family:'Inter',sans-serif;font-size:.7rem;color:rgba(255,255,255,.3);flex-shrink:0}
-    .sv-ep-desc{font-family:'Inter',sans-serif;font-size:.78rem;color:rgba(255,255,255,.38);line-height:1.5;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.data-table{width:100%;border-collapse:collapse;margin:0 0 28px;font-family:'IBM Plex Sans',sans-serif;font-size:.82rem}
+.data-table caption{font-size:.78rem;color:var(--ink-muted);text-align:left;margin-bottom:8px;font-style:italic}
+.data-table th{background:var(--paper-dark);border:1px solid var(--border);padding:9px 12px;text-align:left;font-weight:600;font-size:.75rem;letter-spacing:.04em;color:var(--ink-mid)}
+.data-table td{border:1px solid var(--border-light);padding:8px 12px;color:var(--ink-mid)}
+.data-table tr:nth-child(even) td{background:#fff}
+.data-table tr:hover td{background:#f0ede5}
 
-    /* ── Player ── */
-    #sv-player{
-      display:none;
-      flex-direction:column;
-      /* Takes the remaining height of the fixed overlay after the topbar */
-      flex:1;
-      min-height:0;
-      background:#000;
-      overflow:hidden;
-    }
-    #sv-player.on{display:flex}
+.callout{background:#fff;border-left:3px solid var(--accent2);padding:16px 20px;margin:24px 0;font-size:.92rem;color:var(--ink-mid);line-height:1.75}
+.callout strong{color:var(--accent2);font-family:'IBM Plex Sans',sans-serif}
 
-    .sv-player-header{display:flex;align-items:center;gap:14px;padding:0 28px;height:54px;background:rgba(10,10,14,.9);border-bottom:1px solid rgba(255,255,255,.05);flex-shrink:0}
-    .sv-player-back{display:flex;align-items:center;gap:6px;background:none;border:none;color:rgba(255,255,255,.45);font-family:'Inter',sans-serif;font-size:.82rem;cursor:pointer;transition:color .2s}
-    .sv-player-back:hover{color:#fff}
-    .sv-player-info{flex:1;text-align:center}
-    .sv-player-show{font-family:'Inter',sans-serif;font-size:.92rem;font-weight:700;color:#fff}
-    .sv-player-ep-label{font-family:'Inter',sans-serif;font-size:.7rem;color:rgba(255,255,255,.3);margin-top:1px}
+.footnote-ref{font-family:'IBM Plex Mono',monospace;font-size:.68rem;color:var(--accent2);vertical-align:super;cursor:pointer}
 
-    /* Critical: min-height:0 allows flex children to shrink properly */
-    .sv-player-body{flex:1;display:flex;overflow:hidden;min-height:0}
+/* ─── AUTHOR BIOS ─── */
+.author-bios{margin-top:48px;padding-top:28px;border-top:2px solid var(--border)}
+.author-bios h2{font-family:'IBM Plex Sans',sans-serif;font-size:.85rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-muted);margin-bottom:22px}
+.author-bio{display:flex;gap:16px;margin-bottom:22px;padding-bottom:22px;border-bottom:1px solid var(--border-light)}
+.author-bio:last-child{border-bottom:none}
+.author-avatar{width:56px;height:56px;border-radius:50%;background:var(--paper-dark);border:1px solid var(--border);flex-shrink:0;display:flex;align-items:center;justify-content:center;font-family:'IBM Plex Sans',sans-serif;font-weight:700;font-size:.95rem;color:var(--ink-light)}
+.author-bio-content p{font-size:.84rem;color:var(--ink-muted);font-family:'IBM Plex Sans',sans-serif;line-height:1.7}
+.author-bio-name{font-family:'IBM Plex Sans',sans-serif;font-size:.92rem;font-weight:600;color:var(--ink);margin-bottom:3px}
 
-    .sv-player-screen{
-      flex:1;
-      display:flex;
-      align-items:center;
-      justify-content:center;
-      position:relative;
-      background:#000;
-      overflow:hidden;
-      min-width:0;
-    }
+/* ─── REFERENCES ─── */
+.references{margin-top:40px;padding-top:24px;border-top:2px solid var(--border)}
+.references h2{font-family:'IBM Plex Sans',sans-serif;font-size:.85rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-muted);margin-bottom:20px}
+.ref-item{display:flex;gap:12px;margin-bottom:12px;font-size:.82rem;color:var(--ink-muted);font-family:'IBM Plex Sans',sans-serif;line-height:1.65}
+.ref-num{color:var(--ink-light);font-weight:600;min-width:22px;flex-shrink:0;padding-top:1px}
+.ref-item a{color:var(--accent2)}
 
-    .sv-player-idle{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:18px;position:absolute;inset:0;background:radial-gradient(ellipse 50% 50% at 50% 50%,rgba(230,57,70,.05),#000);z-index:2}
-    .sv-play-ring{width:76px;height:76px;border-radius:50%;border:1px solid rgba(230,57,70,.35);background:rgba(230,57,70,.08);display:flex;align-items:center;justify-content:center;cursor:pointer;transition:all .3s;box-shadow:0 0 32px rgba(230,57,70,.12)}
-    .sv-play-ring:hover{transform:scale(1.1);border-color:rgba(230,57,70,.6);box-shadow:0 0 50px rgba(230,57,70,.25)}
-    .sv-play-ring svg{width:28px;height:28px;fill:#e63946;margin-left:4px}
-    .sv-idle-label{font-family:'Inter',sans-serif;font-size:.68rem;letter-spacing:.14em;color:rgba(255,255,255,.18)}
-    .sv-player-loading{display:none;flex-direction:column;align-items:center;justify-content:center;gap:14px;position:absolute;inset:0;background:#000;z-index:3}
-    .sv-player-loading.on{display:flex}
-    .sv-spin{width:38px;height:38px;border-radius:50%;border:2px solid rgba(230,57,70,.12);border-top-color:#e63946;animation:spin .75s linear infinite}
-    @keyframes spin{to{transform:rotate(360deg)}}
-    .sv-buf-text{font-family:'Inter',sans-serif;font-size:.68rem;letter-spacing:.1em;color:rgba(255,255,255,.2)}
+/* ─── SIDEBAR ─── */
+.sidebar-card{background:#fff;border:1px solid var(--border);margin-bottom:16px;overflow:hidden}
+.sidebar-card-head{padding:12px 16px;border-bottom:1px solid var(--border-light);font-family:'IBM Plex Sans',sans-serif;font-size:.74rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-muted)}
+.sidebar-card-body{padding:14px 16px}
+.sidebar-download-btn{display:flex;align-items:center;gap:9px;width:100%;padding:10px 14px;margin-bottom:8px;border:1px solid var(--border);background:var(--paper);border-radius:3px;font-family:'IBM Plex Sans',sans-serif;font-size:.8rem;font-weight:500;color:var(--ink-mid);cursor:pointer;transition:background .15s}
+.sidebar-download-btn:hover{background:var(--paper-dark)}
+.sidebar-download-btn .icon{width:18px;height:18px;flex-shrink:0;opacity:.5}
+.sidebar-stat{display:flex;justify-content:space-between;align-items:center;padding:7px 0;border-bottom:1px solid var(--border-light);font-family:'IBM Plex Sans',sans-serif;font-size:.8rem}
+.sidebar-stat:last-child{border-bottom:none}
+.sidebar-stat-label{color:var(--ink-muted)}
+.sidebar-stat-val{font-weight:600;color:var(--ink-mid)}
+.related-item{padding:10px 0;border-bottom:1px solid var(--border-light);font-family:'IBM Plex Sans',sans-serif}
+.related-item:last-child{border-bottom:none}
+.related-item-title{font-size:.8rem;font-weight:500;color:var(--accent2);line-height:1.45;margin-bottom:3px}
+.related-item-meta{font-size:.7rem;color:var(--ink-muted)}
+.sidebar-license{font-family:'IBM Plex Sans',sans-serif;font-size:.74rem;color:var(--ink-muted);line-height:1.65}
+.sidebar-funding{font-family:'IBM Plex Sans',sans-serif;font-size:.78rem;color:var(--ink-muted);line-height:1.7}
+.toc-list{list-style:none;padding:0}
+.toc-list li{padding:5px 0;border-bottom:1px solid var(--border-light);font-family:'IBM Plex Sans',sans-serif;font-size:.78rem}
+.toc-list li:last-child{border-bottom:none}
+.toc-list a{color:var(--ink-mid)}
+.toc-list a:hover{color:var(--accent)}
+.toc-num{color:var(--ink-muted);margin-right:6px;font-size:.7rem}
 
-    /* ══ THE FIX ══
-       Removed top:-40px and height:calc(100%+40px).
-       The iframe now fills its container exactly — no offset, no overflow. */
-    #sv-iframe{
-      position:absolute;
-      top:0;
-      left:0;
-      width:100%;
-      height:100%;
-      border:none;
-      display:none;
-      background:#000;
-    }
+/* ─── FOOTER ─── */
+.site-footer{background:#2a2823;color:rgba(255,255,255,.55);padding:40px 24px;margin-top:60px}
+.footer-inner{max-width:var(--max);margin:0 auto;display:grid;grid-template-columns:2fr 1fr 1fr 1fr;gap:32px;font-family:'IBM Plex Sans',sans-serif;font-size:.78rem;line-height:1.75}
+.footer-brand strong{display:block;color:#fff;font-size:.95rem;margin-bottom:8px}
+.footer-col h4{color:rgba(255,255,255,.7);font-size:.72rem;letter-spacing:.1em;text-transform:uppercase;margin-bottom:10px;font-weight:600}
+.footer-col ul{list-style:none}
+.footer-col ul li a{color:rgba(255,255,255,.45);text-decoration:none}
+.footer-col ul li a:hover{color:#fff}
+.footer-bottom{max-width:var(--max);margin:24px auto 0;padding-top:20px;border-top:1px solid rgba(255,255,255,.08);display:flex;justify-content:space-between;align-items:center;font-family:'IBM Plex Sans',sans-serif;font-size:.72rem;color:rgba(255,255,255,.3)}
 
-    .sv-player-sidebar{width:310px;flex-shrink:0;background:#0d0d12;border-left:1px solid rgba(255,255,255,.05);display:flex;flex-direction:column;overflow:hidden}
-    .sv-sidebar-head{padding:16px 20px;border-bottom:1px solid rgba(255,255,255,.05);flex-shrink:0}
-    .sv-sidebar-head-title{font-family:'Inter',sans-serif;font-size:.88rem;font-weight:700;color:#fff;margin-bottom:3px}
-    .sv-sidebar-head-sub{font-family:'Inter',sans-serif;font-size:.7rem;color:rgba(255,255,255,.3)}
-    .sv-sidebar-list{flex:1;overflow-y:auto;padding:6px 0}
-    .sv-sidebar-list::-webkit-scrollbar{width:3px}
-    .sv-sidebar-list::-webkit-scrollbar-thumb{background:rgba(255,255,255,.06);border-radius:2px}
-    .sv-sidebar-ep{display:flex;align-items:center;gap:10px;padding:9px 16px;cursor:pointer;transition:background .15s;border-left:2px solid transparent}
-    .sv-sidebar-ep:hover{background:rgba(255,255,255,.04)}
-    .sv-sidebar-ep.on{background:rgba(230,57,70,.07);border-left-color:#e63946}
-    .sv-sidebar-ep.locked{opacity:.18;cursor:default}
-    .sv-sidebar-thumb{width:62px;height:35px;border-radius:4px;background:#1a1a22;flex-shrink:0;overflow:hidden}
-    .sv-sidebar-thumb img{width:100%;height:100%;object-fit:cover}
-    .sv-sidebar-ep-info{flex:1;min-width:0}
-    .sv-sidebar-ep-name{font-family:'Inter',sans-serif;font-size:.78rem;font-weight:600;color:rgba(255,255,255,.7);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-bottom:2px}
-    .sv-sidebar-ep.on .sv-sidebar-ep-name{color:#fff}
-    .sv-sidebar-ep-dur{font-family:'Inter',sans-serif;font-size:.65rem;color:rgba(255,255,255,.28)}
+/* ─── ISSUE RIBBON ─── */
+.issue-ribbon{max-width:var(--max);margin:20px auto 0;padding:0 24px}
+.issue-ribbon-inner{background:#fff;border:1px solid var(--border);padding:12px 20px;display:flex;align-items:center;gap:20px;flex-wrap:wrap;font-family:'IBM Plex Sans',sans-serif;font-size:.78rem;color:var(--ink-muted)}
+.issue-ribbon strong{color:var(--ink-mid);margin-right:4px}
+.issue-ribbon-sep{color:var(--border)}
 
-    .sv-player-nowbar{flex-shrink:0;padding:11px 24px;background:rgba(10,10,14,.95);border-top:1px solid rgba(255,255,255,.05);display:flex;align-items:center;justify-content:space-between}
-    .sv-now-title{font-family:'Inter',sans-serif;font-size:.85rem;font-weight:700;color:rgba(255,255,255,.85)}
-    .sv-now-sub{font-family:'Inter',sans-serif;font-size:.68rem;color:rgba(255,255,255,.28);margin-top:2px}
-    .sv-hd-pill{display:flex;align-items:center;gap:6px;background:rgba(230,57,70,.1);border:1px solid rgba(230,57,70,.2);border-radius:999px;padding:4px 12px;font-family:'Inter',sans-serif;font-size:.65rem;font-weight:700;color:#ff7070;letter-spacing:.06em}
-    .sv-hd-dot{width:5px;height:5px;border-radius:50%;background:#e63946;box-shadow:0 0 6px #e63946}
+/* ─── PEER REVIEW ─── */
+.peer-box{background:#fff;border:1px solid var(--border);padding:20px 24px;margin-top:32px}
+.peer-box h2{font-family:'IBM Plex Sans',sans-serif;font-size:.85rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-muted);margin-bottom:14px}
+.reviewer-comment{border-left:3px solid var(--border);padding-left:14px;margin-bottom:16px;font-family:'IBM Plex Sans',sans-serif;font-size:.82rem;color:var(--ink-muted);line-height:1.7}
+.reviewer-comment strong{color:var(--ink-light);font-size:.75rem;letter-spacing:.05em}
 
-    @media(max-width:860px){
-      .sv-hero{padding:0 24px 40px}
-      .sv-hero-title{font-size:2.6rem}
-      .sv-library{padding:0 24px 40px}
-      .sv-detail-hero{padding:0 24px 32px}
-      .sv-detail-body{padding:0 24px 40px}
-      .sv-detail-title{font-size:2rem}
-      .sv-player-sidebar{display:none}
-    }
-    @media(max-width:600px){
-      .sv-hero{height:70vh}
-      .sv-hero-title{font-size:2rem}
-      .sv-grid{grid-template-columns:1fr 1fr}
-    }
-  </style>
-<base target="_blank">
+/* ─── COOKIE BANNER ─── */
+.cookie-banner{position:fixed;bottom:0;left:0;right:0;background:#2a2823;color:rgba(255,255,255,.75);padding:14px 24px;z-index:100;display:flex;align-items:center;justify-content:space-between;gap:16px;font-family:'IBM Plex Sans',sans-serif;font-size:.78rem;flex-wrap:wrap}
+.cookie-banner a{color:#a8d4f0}
+.cookie-banner button{background:#f7f6f1;color:#1e1e1e;border:none;padding:8px 18px;font-family:'IBM Plex Sans',sans-serif;font-weight:600;font-size:.78rem;cursor:pointer;border-radius:3px;white-space:nowrap}
+
+
+/* ══════════════════════════════════════════
+   STREAMVAULT OVERLAY
+══════════════════════════════════════════ */
+#sv-overlay{display:none;position:fixed;inset:0;z-index:9999;background:#08080d;flex-direction:column;overflow:hidden}
+#sv-overlay.open{display:flex;animation:svFadeIn .3s ease both}
+@keyframes svFadeIn{from{opacity:0}to{opacity:1}}
+
+#sv-topbar{flex-shrink:0;height:62px;display:flex;align-items:center;justify-content:space-between;padding:0 40px;position:relative;z-index:50;border-bottom:1px solid rgba(255,255,255,.05)}
+.sv-logo{font-family:'IBM Plex Sans',sans-serif;font-weight:700;font-size:1.25rem;letter-spacing:-.03em;color:#fff;display:flex;align-items:center;gap:10px;cursor:pointer;user-select:none}
+.sv-logo-icon{width:32px;height:32px;border-radius:8px;background:linear-gradient(135deg,#e63946,#a81e29);display:flex;align-items:center;justify-content:center}
+.sv-logo-icon svg{width:16px;height:16px;fill:#fff}
+.sv-topbar-nav{display:flex;gap:4px;flex:1;padding:0 40px}
+.sv-topbar-nav button{background:none;border:none;color:rgba(255,255,255,.5);font-family:'IBM Plex Sans',sans-serif;font-size:.85rem;font-weight:500;cursor:pointer;padding:6px 14px;border-radius:6px;transition:all .2s}
+.sv-topbar-nav button:hover{color:#fff;background:rgba(255,255,255,.07)}
+.sv-topbar-nav button.on{color:#fff}
+.sv-topbar-right{display:flex;align-items:center;gap:10px}
+.sv-search-bar{display:flex;align-items:center;gap:8px;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.1);border-radius:8px;padding:6px 14px}
+.sv-search-bar input{background:none;border:none;outline:none;color:#fff;font-family:'IBM Plex Sans',sans-serif;font-size:.82rem;width:140px}
+.sv-search-bar input::placeholder{color:rgba(255,255,255,.3)}
+.sv-search-bar svg{width:14px;height:14px;stroke:rgba(255,255,255,.3)}
+#sv-close{display:flex;align-items:center;gap:7px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);border-radius:8px;padding:7px 16px;color:rgba(255,255,255,.5);font-family:'IBM Plex Sans',sans-serif;font-size:.78rem;cursor:pointer;transition:all .2s}
+#sv-close:hover{background:rgba(255,255,255,.12);color:#fff}
+
+.sv-view{display:none;flex:1;overflow-y:auto;overflow-x:hidden}
+.sv-view.on{display:block}
+.sv-view::-webkit-scrollbar{width:5px}
+.sv-view::-webkit-scrollbar-thumb{background:rgba(255,255,255,.08);border-radius:3px}
+
+/* ─── HERO ─── */
+.sv-hero{position:relative;height:88vh;min-height:500px;max-height:700px;display:flex;align-items:flex-end;padding:0 60px 64px;overflow:hidden}
+.sv-hero-bg{position:absolute;inset:0;background-size:cover;background-position:center 20%;filter:brightness(.75)}
+.sv-hero-bg::after{content:'';position:absolute;inset:0;background:linear-gradient(to top,rgba(8,8,13,1) 0%,rgba(8,8,13,.82) 28%,rgba(8,8,13,.35) 60%,rgba(8,8,13,.05) 100%)}
+.sv-hero-content{position:relative;z-index:2;max-width:640px}
+.sv-hero-label{display:inline-flex;align-items:center;gap:8px;font-family:'IBM Plex Sans',sans-serif;font-size:.68rem;font-weight:700;letter-spacing:.2em;text-transform:uppercase;color:#e63946;margin-bottom:14px}
+.sv-hero-label::before{content:'';width:20px;height:2px;background:#e63946;border-radius:2px}
+.sv-hero-title{font-family:'IBM Plex Sans',sans-serif;font-size:4rem;font-weight:700;color:#fff;line-height:.95;letter-spacing:-.04em;margin-bottom:14px}
+.sv-hero-badges{display:flex;align-items:center;gap:8px;margin-bottom:16px;flex-wrap:wrap}
+.sv-badge{font-family:'IBM Plex Sans',sans-serif;font-size:.7rem;font-weight:600;padding:4px 10px;border-radius:4px;background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.14);color:rgba(255,255,255,.7)}
+.sv-badge.green{background:rgba(70,211,105,.1);border-color:rgba(70,211,105,.2);color:#46d369}
+.sv-badge.new{background:rgba(230,57,70,.12);border-color:rgba(230,57,70,.25);color:#ff6b74}
+.sv-hero-desc{font-family:'IBM Plex Sans',sans-serif;font-size:.92rem;color:rgba(255,255,255,.65);line-height:1.7;margin-bottom:26px;max-width:500px}
+.sv-hero-btns{display:flex;gap:12px}
+.sv-btn-primary{display:inline-flex;align-items:center;gap:9px;background:#e63946;color:#fff;padding:13px 30px;border-radius:8px;font-family:'IBM Plex Sans',sans-serif;font-size:.9rem;font-weight:700;border:none;cursor:pointer;transition:all .2s;box-shadow:0 4px 24px rgba(230,57,70,.35)}
+.sv-btn-primary:hover{background:#c1121f;transform:translateY(-1px)}
+.sv-btn-ghost{display:inline-flex;align-items:center;gap:9px;background:rgba(255,255,255,.12);color:#fff;padding:13px 24px;border-radius:8px;font-family:'IBM Plex Sans',sans-serif;font-size:.9rem;font-weight:600;border:1px solid rgba(255,255,255,.18);cursor:pointer;transition:all .2s}
+.sv-btn-ghost:hover{background:rgba(255,255,255,.2)}
+
+/* ─── CONTINUE WATCHING ─── */
+.sv-section{padding:0 60px;margin-bottom:48px}
+.sv-section-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:20px}
+.sv-section-title{font-family:'IBM Plex Sans',sans-serif;font-size:1.05rem;font-weight:700;color:#fff;letter-spacing:-.01em}
+.sv-section-see-all{font-family:'IBM Plex Sans',sans-serif;font-size:.78rem;color:rgba(255,255,255,.4);cursor:pointer}
+.sv-section-see-all:hover{color:#fff}
+
+.sv-continue-grid{display:flex;gap:14px;overflow-x:auto;padding-bottom:8px}
+.sv-continue-grid::-webkit-scrollbar{height:3px}
+.sv-continue-grid::-webkit-scrollbar-thumb{background:rgba(255,255,255,.1);border-radius:2px}
+.sv-cw-card{flex-shrink:0;width:260px;border-radius:8px;overflow:hidden;cursor:pointer;background:#141418;position:relative;transition:transform .25s}
+.sv-cw-card:hover{transform:scale(1.03)}
+.sv-cw-img{width:100%;height:146px;object-fit:cover;display:block}
+.sv-cw-info{padding:10px 12px}
+.sv-cw-show{font-family:'IBM Plex Sans',sans-serif;font-size:.78rem;font-weight:700;color:#fff;margin-bottom:2px}
+.sv-cw-ep{font-family:'IBM Plex Sans',sans-serif;font-size:.7rem;color:rgba(255,255,255,.4)}
+.sv-cw-bar{height:3px;background:rgba(255,255,255,.1);border-radius:2px;margin:8px 0 0}
+.sv-cw-progress{height:3px;background:#e63946;border-radius:2px;width:0%}
+
+/* ─── LIBRARY GRID ─── */
+.sv-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:18px}
+.sv-card{position:relative;border-radius:10px;overflow:hidden;cursor:pointer;background:#141418;transition:transform .3s cubic-bezier(.2,0,.2,1),box-shadow .3s;aspect-ratio:2/3}
+.sv-card:hover{transform:translateY(-6px) scale(1.02);box-shadow:0 20px 50px rgba(0,0,0,.7)}
+.sv-card-img{position:absolute;inset:0;background-size:cover;background-position:center;transition:transform .5s ease}
+.sv-card:hover .sv-card-img{transform:scale(1.06)}
+.sv-card-always{position:absolute;inset:0;background:linear-gradient(to top,rgba(8,8,13,.92) 0%,transparent 55%);display:flex;flex-direction:column;justify-content:flex-end;padding:16px}
+.sv-card-title{font-family:'IBM Plex Sans',sans-serif;font-size:1rem;font-weight:700;color:#fff;margin-bottom:3px;letter-spacing:-.02em}
+.sv-card-sub{font-family:'IBM Plex Sans',sans-serif;font-size:.7rem;color:rgba(255,255,255,.45)}
+.sv-card-overlay{position:absolute;inset:0;background:linear-gradient(to top,rgba(8,8,13,.98) 0%,rgba(8,8,13,.55) 50%,transparent 100%);opacity:0;transition:opacity .3s;display:flex;flex-direction:column;justify-content:flex-end;padding:16px}
+.sv-card:hover .sv-card-overlay{opacity:1}
+.sv-card-desc{font-family:'IBM Plex Sans',sans-serif;font-size:.75rem;color:rgba(255,255,255,.6);line-height:1.5;margin-bottom:12px;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
+.sv-card-actions{display:flex;gap:7px}
+.sv-card-play{flex:1;display:flex;align-items:center;justify-content:center;gap:6px;background:#e63946;color:#fff;border:none;border-radius:6px;font-family:'IBM Plex Sans',sans-serif;font-size:.75rem;font-weight:700;padding:8px 0;cursor:pointer;transition:background .2s}
+.sv-card-play:hover{background:#c1121f}
+.sv-card-info-btn{display:flex;align-items:center;justify-content:center;background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.15);border-radius:6px;padding:8px 12px;color:#fff;font-size:.75rem;font-family:'IBM Plex Sans',sans-serif;font-weight:600;cursor:pointer;transition:background .2s;white-space:nowrap}
+.sv-card-info-btn:hover{background:rgba(255,255,255,.2)}
+.sv-card-badge-top{position:absolute;top:10px;right:10px;background:#e63946;color:#fff;font-family:'IBM Plex Sans',sans-serif;font-size:.6rem;font-weight:700;padding:3px 7px;border-radius:4px;letter-spacing:.06em;z-index:2}
+
+/* ─── DETAIL ─── */
+.sv-detail-hero{position:relative;height:60vh;min-height:380px;display:flex;align-items:flex-end;padding:0 60px 44px;overflow:hidden}
+.sv-detail-bg{position:absolute;inset:0;background-size:cover;background-position:center 15%;filter:brightness(.7)}
+.sv-detail-bg::after{content:'';position:absolute;inset:0;background:linear-gradient(to top,rgba(8,8,13,1) 0%,rgba(8,8,13,.7) 40%,rgba(8,8,13,.15) 100%)}
+.sv-detail-content{position:relative;z-index:2;max-width:700px}
+.sv-back{display:inline-flex;align-items:center;gap:7px;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.1);border-radius:999px;padding:7px 16px;color:rgba(255,255,255,.6);font-family:'IBM Plex Sans',sans-serif;font-size:.78rem;cursor:pointer;transition:all .2s;margin-bottom:20px}
+.sv-back:hover{background:rgba(255,255,255,.15);color:#fff}
+.sv-detail-title{font-family:'IBM Plex Sans',sans-serif;font-size:2.8rem;font-weight:700;color:#fff;letter-spacing:-.04em;margin-bottom:10px}
+.sv-detail-meta{display:flex;align-items:center;gap:12px;font-family:'IBM Plex Sans',sans-serif;font-size:.82rem;color:rgba(255,255,255,.5);margin-bottom:12px;flex-wrap:wrap}
+.sv-detail-meta .gm{color:#46d369;font-weight:700}
+.sv-detail-desc{font-family:'IBM Plex Sans',sans-serif;font-size:.9rem;color:rgba(255,255,255,.6);line-height:1.75;max-width:580px;margin-bottom:20px}
+.sv-detail-tags{display:flex;gap:7px;flex-wrap:wrap;margin-bottom:22px}
+.sv-tag{background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);border-radius:999px;padding:4px 12px;font-family:'IBM Plex Sans',sans-serif;font-size:.7rem;color:rgba(255,255,255,.45)}
+.sv-detail-body{padding:0 60px 60px;background:#08080d}
+.sv-season-tabs{display:flex;gap:8px;margin-bottom:28px;padding-top:12px}
+.sv-season-tab{padding:8px 20px;border-radius:999px;font-family:'IBM Plex Sans',sans-serif;font-size:.82rem;font-weight:600;cursor:pointer;border:1px solid rgba(255,255,255,.1);background:rgba(255,255,255,.04);color:rgba(255,255,255,.4);transition:all .2s}
+.sv-season-tab:hover{color:rgba(255,255,255,.8);border-color:rgba(255,255,255,.2)}
+.sv-season-tab.on{background:#e63946;border-color:#e63946;color:#fff;box-shadow:0 0 20px rgba(230,57,70,.25)}
+.sv-ep-list{max-width:880px}
+.sv-ep{display:flex;align-items:center;gap:16px;padding:12px 14px;border-radius:8px;cursor:pointer;transition:background .18s;border:1px solid transparent;margin-bottom:4px}
+.sv-ep:hover:not(.sv-ep-locked){background:rgba(255,255,255,.04);border-color:rgba(255,255,255,.05)}
+.sv-ep.sv-ep-locked{opacity:.2;cursor:default}
+.sv-ep-num{font-family:'IBM Plex Sans',sans-serif;font-size:1.2rem;font-weight:700;color:rgba(255,255,255,.1);width:34px;text-align:center;flex-shrink:0}
+.sv-ep-thumb{width:120px;height:68px;border-radius:6px;background:#1a1a22;flex-shrink:0;overflow:hidden;position:relative}
+.sv-ep-thumb img{width:100%;height:100%;object-fit:cover}
+.sv-ep-hover-play{position:absolute;inset:0;background:rgba(0,0,0,.55);display:flex;align-items:center;justify-content:center;opacity:0;transition:opacity .2s}
+.sv-ep:hover:not(.sv-ep-locked) .sv-ep-hover-play{opacity:1}
+.sv-ep-info{flex:1;min-width:0}
+.sv-ep-row{display:flex;justify-content:space-between;align-items:center;margin-bottom:5px}
+.sv-ep-name{font-family:'IBM Plex Sans',sans-serif;font-size:.9rem;font-weight:700;color:rgba(255,255,255,.85);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.sv-ep-dur{font-family:'IBM Plex Sans',sans-serif;font-size:.7rem;color:rgba(255,255,255,.3);flex-shrink:0}
+.sv-ep-desc{font-family:'IBM Plex Sans',sans-serif;font-size:.78rem;color:rgba(255,255,255,.38);line-height:1.5;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+
+/* ─── PLAYER ─── */
+#sv-player{display:none;flex-direction:column;flex:1;min-height:0;background:#000;overflow:hidden}
+#sv-player.on{display:flex}
+.sv-player-header{display:flex;align-items:center;gap:14px;padding:0 28px;height:52px;background:rgba(8,8,13,.95);border-bottom:1px solid rgba(255,255,255,.05);flex-shrink:0}
+.sv-player-back{display:flex;align-items:center;gap:6px;background:none;border:none;color:rgba(255,255,255,.4);font-family:'IBM Plex Sans',sans-serif;font-size:.82rem;cursor:pointer;transition:color .2s}
+.sv-player-back:hover{color:#fff}
+.sv-player-info{flex:1;text-align:center}
+.sv-player-show{font-family:'IBM Plex Sans',sans-serif;font-size:.9rem;font-weight:700;color:#fff}
+.sv-player-ep-label{font-family:'IBM Plex Sans',sans-serif;font-size:.7rem;color:rgba(255,255,255,.3);margin-top:1px}
+.sv-player-body{flex:1;display:flex;overflow:hidden;min-height:0}
+.sv-player-screen{flex:1;display:flex;align-items:center;justify-content:center;position:relative;background:#000;overflow:hidden;min-width:0}
+.sv-player-idle{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:20px;position:absolute;inset:0;background:radial-gradient(ellipse 50% 50% at 50% 50%,rgba(230,57,70,.06),#000);z-index:2}
+.sv-play-ring{width:80px;height:80px;border-radius:50%;border:1px solid rgba(230,57,70,.3);background:rgba(230,57,70,.07);display:flex;align-items:center;justify-content:center;cursor:pointer;transition:all .3s;box-shadow:0 0 40px rgba(230,57,70,.1)}
+.sv-play-ring:hover{transform:scale(1.1);border-color:rgba(230,57,70,.55);box-shadow:0 0 60px rgba(230,57,70,.2)}
+.sv-play-ring svg{width:28px;height:28px;fill:#e63946;margin-left:4px}
+.sv-idle-title{font-family:'IBM Plex Sans',sans-serif;font-size:.95rem;font-weight:700;color:rgba(255,255,255,.85)}
+.sv-idle-sub{font-family:'IBM Plex Sans',sans-serif;font-size:.7rem;color:rgba(255,255,255,.25);letter-spacing:.1em}
+.sv-player-loading{display:none;flex-direction:column;align-items:center;justify-content:center;gap:14px;position:absolute;inset:0;background:#000;z-index:3}
+.sv-player-loading.on{display:flex}
+.sv-spin{width:40px;height:40px;border-radius:50%;border:2px solid rgba(230,57,70,.1);border-top-color:#e63946;animation:spin .75s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.sv-buf-text{font-family:'IBM Plex Sans',sans-serif;font-size:.7rem;letter-spacing:.12em;color:rgba(255,255,255,.2);text-transform:uppercase}
+#sv-iframe{position:absolute;top:0;left:0;width:100%;height:100%;border:none;display:none;background:#000}
+.sv-player-sidebar{width:320px;flex-shrink:0;background:#0d0d12;border-left:1px solid rgba(255,255,255,.05);display:flex;flex-direction:column;overflow:hidden}
+.sv-sidebar-head{padding:16px 20px;border-bottom:1px solid rgba(255,255,255,.05);flex-shrink:0}
+.sv-sidebar-head-title{font-family:'IBM Plex Sans',sans-serif;font-size:.88rem;font-weight:700;color:#fff;margin-bottom:2px}
+.sv-sidebar-head-sub{font-family:'IBM Plex Sans',sans-serif;font-size:.7rem;color:rgba(255,255,255,.3)}
+.sv-sidebar-list{flex:1;overflow-y:auto;padding:6px 0}
+.sv-sidebar-list::-webkit-scrollbar{width:3px}
+.sv-sidebar-list::-webkit-scrollbar-thumb{background:rgba(255,255,255,.06);border-radius:2px}
+.sv-sidebar-ep{display:flex;align-items:center;gap:10px;padding:9px 16px;cursor:pointer;transition:background .15s;border-left:2px solid transparent}
+.sv-sidebar-ep:hover{background:rgba(255,255,255,.04)}
+.sv-sidebar-ep.on{background:rgba(230,57,70,.07);border-left-color:#e63946}
+.sv-sidebar-ep.locked{opacity:.18;cursor:default}
+.sv-sidebar-thumb{width:64px;height:36px;border-radius:5px;background:#1a1a22;flex-shrink:0;overflow:hidden}
+.sv-sidebar-thumb img{width:100%;height:100%;object-fit:cover}
+.sv-sidebar-ep-info{flex:1;min-width:0}
+.sv-sidebar-ep-name{font-family:'IBM Plex Sans',sans-serif;font-size:.78rem;font-weight:600;color:rgba(255,255,255,.65);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-bottom:2px}
+.sv-sidebar-ep.on .sv-sidebar-ep-name{color:#fff}
+.sv-sidebar-ep-dur{font-family:'IBM Plex Sans',sans-serif;font-size:.65rem;color:rgba(255,255,255,.25)}
+.sv-player-nowbar{flex-shrink:0;padding:10px 24px;background:rgba(8,8,13,.98);border-top:1px solid rgba(255,255,255,.05);display:flex;align-items:center;justify-content:space-between}
+.sv-now-title{font-family:'IBM Plex Sans',sans-serif;font-size:.85rem;font-weight:700;color:rgba(255,255,255,.85)}
+.sv-now-sub{font-family:'IBM Plex Sans',sans-serif;font-size:.68rem;color:rgba(255,255,255,.28);margin-top:2px}
+.sv-hd-pill{display:flex;align-items:center;gap:6px;background:rgba(230,57,70,.1);border:1px solid rgba(230,57,70,.2);border-radius:999px;padding:4px 12px;font-family:'IBM Plex Sans',sans-serif;font-size:.65rem;font-weight:700;color:#ff7070;letter-spacing:.06em}
+.sv-hd-dot{width:5px;height:5px;border-radius:50%;background:#e63946;box-shadow:0 0 6px #e63946}
+
+@media(max-width:960px){
+  .page-layout{grid-template-columns:1fr}
+  .sidebar-col{display:none}
+  .sv-hero{padding:0 24px 40px}
+  .sv-hero-title{font-size:2.6rem}
+  .sv-section{padding:0 24px}
+  .sv-detail-hero{padding:0 24px 32px}
+  .sv-detail-body{padding:0 24px 40px}
+  .sv-detail-title{font-size:2rem}
+  .sv-player-sidebar{display:none}
+  .footer-inner{grid-template-columns:1fr 1fr}
+}
+@media(max-width:600px){
+  .sv-hero{height:72vh}
+  .sv-hero-title{font-size:2.1rem}
+  .sv-grid{grid-template-columns:1fr 1fr}
+  .sv-topbar-nav{display:none}
+  #sv-topbar{padding:0 20px}
+}
+</style>
+<base target="_blank"/>
 </head>
 <body>
 
-<header class="journal-header">
-  <div class="journal-title">International Peer-Reviewed Quarterly</div>
-  <div class="journal-name">Journal of Digital Forensic Methodologies</div>
-  <div class="journal-meta">
-    <span>Volume 14</span> · <span>Issue 3</span> · <span>March 2025</span> · <span>ISSN 2045-8827</span>
+<div class="notice-bar">
+  Access to this article is free during the open-access promotional period (March–June 2025). <a href="#">Learn more about our open access policy →</a>
+</div>
+
+<header class="site-header">
+  <div class="header-top">
+    <div class="header-logo-group">
+      <div class="header-logo-mark"><span>JDF</span></div>
+      <div class="header-pub-name">
+        <strong>Journal of Digital Forensic Methodologies</strong>
+        <small>PUBLISHED BY THE INTERNATIONAL SOCIETY FOR DIGITAL FORENSICS</small>
+      </div>
+    </div>
+    <div class="header-actions">
+      <button class="btn-login">Log In</button>
+      <button class="btn-sub">Subscribe</button>
+    </div>
   </div>
-  <nav class="journal-nav">
-    <a href="#abstract">Abstract</a>
-    <a href="#introduction">Introduction</a>
-    <a href="#methodology">Methodology</a>
-    <a href="#results">Results</a>
-    <a href="#discussion">Discussion</a>
-    <a href="#references">References</a>
+  <nav class="header-nav">
+    <ul>
+      <li><a href="#" class="active">Articles</a></li>
+      <li><a href="#">Current Issue</a></li>
+      <li><a href="#">Archive</a></li>
+      <li><a href="#">Authors</a></li>
+      <li><a href="#">Submit Manuscript</a></li>
+      <li><a href="#">Peer Review</a></li>
+      <li><a href="#">Editorial Board</a></li>
+      <li><a href="#">About</a></li>
+    </ul>
   </nav>
 </header>
 
-<main class="article-wrap">
-  <header class="article-header">
-    <div class="article-type">Original Research Article</div>
-    <h1 class="article-title">A Comparative Analysis of File System Artifact Recovery in Windows 11 NTFS and ReFS Environments: Implications for Enterprise Digital Forensic Investigations</h1>
-    <div class="article-authors">Dr. Harold P. Whitmore<sup>1</sup>, Dr. Sarah J. Caldwell<sup>2</sup>, Prof. Michael T. Brennan<sup>3</sup></div>
-    <div class="article-affil"><sup>1</sup>University of Nottingham · <sup>2</sup>Delft University of Technology · <sup>3</sup>RMIT Australia</div>
-    <div class="article-dates">
-      <span>Received: 14 November 2024</span>
-      <span>Accepted: 03 February 2025</span>
-      <span>Published: 18 March 2025</span>
+<div class="issue-ribbon">
+  <div class="issue-ribbon-inner">
+    <strong>Volume 14, Issue 3</strong> · March 2025
+    <span class="issue-ribbon-sep">|</span>
+    ISSN 2045-8827 (Print) &nbsp;·&nbsp; ISSN 2045-8835 (Online)
+    <span class="issue-ribbon-sep">|</span>
+    Impact Factor: <strong>3.82</strong>
+    <span class="issue-ribbon-sep">|</span>
+    CiteScore: <strong>4.1</strong>
+    <span class="issue-ribbon-sep">|</span>
+    Indexed in: Scopus · Web of Science · DBLP
+  </div>
+</div>
+
+<div class="breadcrumb">
+  <a href="#">Home</a><span>›</span>
+  <a href="#">Journal of Digital Forensic Methodologies</a><span>›</span>
+  <a href="#">Volume 14, Issue 3</a><span>›</span>
+  Article
+</div>
+
+<div class="page-layout">
+  <main class="article-col">
+    <header class="article-header">
+      <div>
+        <span class="art-type-badge">Original Research Article</span>
+        <span class="art-section-tag">File Systems & Storage Forensics</span>
+      </div>
+      <h1 class="art-title">A Comparative Analysis of File System Artifact Recovery in Windows 11 NTFS and ReFS Environments: Implications for Enterprise Digital Forensic Investigations</h1>
+      <div class="art-authors">
+        <a href="#">Dr. Harold P. Whitmore</a><sup>a,1</sup>,
+        <a href="#">Dr. Sarah J. Caldwell</a><sup>b</sup>,
+        <a href="#">Prof. Michael T. Brennan</a><sup>c</sup>
+      </div>
+      <div class="art-affiliations">
+        <sup>a</sup> School of Computer Science, University of Nottingham, Nottingham NG7 2RD, United Kingdom<br/>
+        <sup>b</sup> Department of Computer Science &amp; Engineering, Delft University of Technology, 2628 CD Delft, Netherlands<br/>
+        <sup>c</sup> School of Computing Technologies, RMIT University, Melbourne VIC 3000, Australia<br/>
+        <sup>1</sup> Corresponding author. E-mail: h.whitmore@nottingham.ac.uk
+      </div>
+      <div class="art-dates">
+        <span>Received: 14 November 2024</span>
+        <span>Revised: 22 January 2025</span>
+        <span>Accepted: 3 February 2025</span>
+        <span>Available online: 18 March 2025</span>
+      </div>
+      <div class="art-doi">DOI: <a href="#">https://doi.org/10.1016/j.jdfm.2025.03.004</a></div>
+      <div class="art-metrics-row">
+        <div class="art-metric"><span class="art-metric-num">14,291</span><span class="art-metric-label">Views</span></div>
+        <div class="art-metric"><span class="art-metric-num">382</span><span class="art-metric-label">Downloads</span></div>
+        <div class="art-metric"><span class="art-metric-num">9</span><span class="art-metric-label">Citations</span></div>
+        <div class="art-metric"><span class="art-metric-num">47</span><span class="art-metric-label">Saves</span></div>
+        <div class="art-metric"><span class="art-metric-num">3.8 / 5</span><span class="art-metric-label">Avg. Rating</span></div>
+      </div>
+    </header>
+
+    <div class="abstract-section" id="abstract">
+      <h2>Abstract</h2>
+      <p>This study presents a comprehensive comparative analysis of artifact recovery rates, metadata preservation fidelity, and journaling integrity across 847 distinct forensic images derived from controlled laboratory environments simulating enterprise Windows 11 deployments. Using a novel Forensic Resilience Index (FRI) — a composite scoring metric integrating $MFT completeness, $LogFile continuity, journal sequence coherence, and timestamp accuracy — we systematically evaluated New Technology File System (NTFS) and Resilient File System (ReFS) performance under six categories of anti-forensic pressure: secure deletion, volume shadow copy manipulation, journaling disruption, metadata timestomping, cluster reallocation, and encryption-at-rest. Our findings reveal that NTFS volumes (mean FRI: 0.647, σ = 0.091) consistently outperform ReFS (mean FRI: 0.581, σ = 0.114) in conventional artifact recovery scenarios. However, ReFS demonstrates statistically superior journal integrity under high write-volume conditions (p &lt; 0.001), owing to its native B+ tree allocation and block-clone semantics. We further document 14 previously unreported artifact generation pathways within the ReFS 3.7 specification and propose a revised forensic workflow adapted for hybrid NTFS/ReFS enterprise environments. These findings have material implications for chain-of-custody procedures, tool validation protocols, and expert witness testimony in jurisdictions adopting Windows Server 2022 and Windows 11 24H2.</p>
+      <div class="keywords">
+        <strong>Keywords:</strong>
+        <span class="kw">digital forensics</span>
+        <span class="kw">NTFS</span>
+        <span class="kw">ReFS 3.7</span>
+        <span class="kw">file system analysis</span>
+        <span class="kw">anti-forensics</span>
+        <span class="kw">Windows 11 24H2</span>
+        <span class="kw">Forensic Resilience Index</span>
+        <span class="kw">chain of custody</span>
+        <span class="kw">artifact recovery</span>
+        <span class="kw">enterprise investigation</span>
+      </div>
     </div>
-  </header>
-  <div class="abstract-box" id="abstract">
-    <div class="abstract-label">Abstract</div>
-    <p class="abstract-text">This study presents a comprehensive comparative analysis of artifact recovery rates, metadata preservation, and journaling integrity across 847 distinct forensic images derived from controlled laboratory environments.</p>
-    <div class="keywords"><strong>Keywords:</strong> digital forensics, NTFS, ReFS, file system analysis, anti-forensics, Windows 11, chain of custody</div>
-  </div>
-  <div class="article-body">
-    <h2 id="introduction">1. Introduction</h2>
-    <p>The evidentiary landscape of modern digital forensics is inextricably bound to the architectural idiosyncrasies of contemporary file systems.</p>
-    <h2 id="methodology">2. Methodology</h2>
-    <p>A total of 847 forensic images were generated across 14 experimental conditions using Autopsy, Sleuth Kit, FTK Imager, and a custom ReFS Parser.</p>
-    <h2 id="results">3. Results</h2>
-    <p>NTFS volumes exhibited a mean Forensic Resilience Index of 0.647, while ReFS volumes achieved a mean FRI of 0.581.</p>
-    <h2 id="discussion">4. Discussion</h2>
-    <p>Our findings challenge the prevailing assumption that newer file systems necessarily complicate forensic analysis.</p>
-    <h2 id="references">References</h2>
-    <p>Carrier (2005); Bell &amp; Boddington (2010); Lallie et al. (2020); Microsoft Corporation (2023).</p>
-  </div>
-  <div class="footer-note">© 2025 The Authors. Published by the International Society for Digital Forensics.<br>Open access under CC BY-NC-ND 4.0.</div>
-</main>
 
-<!-- ══ STREAMING OVERLAY ══ -->
+    <div class="article-body">
+      <h2 id="introduction">1. Introduction</h2>
+      <p>The evidentiary landscape of modern digital forensics is inextricably bound to the architectural idiosyncrasies of contemporary file systems. As enterprise computing environments increasingly migrate from the decades-old New Technology File System (NTFS) to the comparatively nascent Resilient File System (ReFS), practitioners and researchers alike face a pivotal reconfiguration of investigative assumptions, toolchain dependencies, and courtroom testimony standards.<span class="footnote-ref">[1]</span></p>
+      <p>Microsoft introduced ReFS in Windows Server 2012, positioned primarily as a high-resilience alternative for storage spaces and Hyper-V workloads. Subsequent revisions — culminating in the ReFS 3.7 specification bundled with Windows Server 2022 and Windows 11 24H2 — have progressively expanded its enterprise adoption footprint. Yet the forensic literature has struggled to keep pace with this structural evolution. A systematic review of publications indexed in Web of Science and Scopus between 2012 and 2024 reveals that fewer than 3.2% of peer-reviewed digital forensics studies specifically address ReFS artifact generation, compared to 41.7% addressing NTFS in equivalent depth.<span class="footnote-ref">[2]</span></p>
+      <p>This gap is consequential. Enterprise investigations — whether concerning insider threats, ransomware incidents, or regulatory compliance violations — increasingly encounter mixed file system environments in which storage pools, virtual disk images, and local volumes co-exist across NTFS and ReFS partitions. The present study responds to this deficit with a large-scale empirical assessment of comparative artifact recovery under controlled, reproducible conditions.</p>
+
+      <div class="callout">
+        <strong>Key Finding:</strong> ReFS 3.7 introduces 14 previously undocumented artifact generation pathways that, if unrecognised by examiners, may result in material evidence being overlooked or misattributed in enterprise forensic investigations. A revised forensic workflow addressing these pathways is presented in Section 4.3.
+      </div>
+
+      <h2 id="methodology">2. Methodology</h2>
+      <h3>2.1 Experimental Design and Image Corpus</h3>
+      <p>A total of 847 forensic images were generated across 14 experimental conditions using Autopsy 4.21, The Sleuth Kit 4.12, FTK Imager 4.7.1.2, and a bespoke ReFS Parser developed by the research team (ReFS-Parse v1.4, available under MIT licence at the project repository). Images were acquired from 12 identically configured physical workstations running Windows 11 24H2 (Build 26100.2314) across a 16-week experimental period from June to September 2024. Each workstation hosted dual-partition configurations: a 512 GB NVMe NTFS system volume and a 1 TB HDD ReFS data volume, replicating a common enterprise architecture observed in 34% of Fortune 500 IT environment surveys conducted in 2023.</p>
+      <p>All acquisitions were performed using hardware write-blockers (Tableau TX1) with MD5 and SHA-256 hash verification at acquisition and post-analysis stages. Experimental conditions were stratified across six anti-forensic pressure categories detailed in Table 1.</p>
+
+      <table class="data-table">
+        <caption>Table 1. Experimental conditions by anti-forensic category and sample distribution (N=847).</caption>
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>Anti-Forensic Category</th>
+            <th>NTFS Samples</th>
+            <th>ReFS Samples</th>
+            <th>Tool(s) Applied</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr><td>1</td><td>Secure deletion (DoD 5220.22-M)</td><td>72</td><td>72</td><td>Eraser 6.2, sdelete</td></tr>
+          <tr><td>2</td><td>VSS manipulation</td><td>65</td><td>65</td><td>vssadmin, custom PowerShell</td></tr>
+          <tr><td>3</td><td>Journal disruption (fsutil usn)</td><td>60</td><td>60</td><td>fsutil, custom C# driver</td></tr>
+          <tr><td>4</td><td>Metadata timestomping</td><td>58</td><td>58</td><td>Meterpreter timestomp, SetFileTime</td></tr>
+          <tr><td>5</td><td>Cluster reallocation stress</td><td>45</td><td>45</td><td>Custom write-fill script</td></tr>
+          <tr><td>6</td><td>BitLocker/AES-256 encryption</td><td>48</td><td>48</td><td>BitLocker CLI</td></tr>
+          <tr><td colspan="2"><strong>Total</strong></td><td><strong>348</strong></td><td><strong>348</strong></td><td></td></tr>
+          <tr><td colspan="2">Control (no anti-forensic pressure)</td><td>76</td><td>75</td><td>N/A</td></tr>
+        </tbody>
+      </table>
+
+      <h3>2.2 The Forensic Resilience Index (FRI)</h3>
+      <p>The FRI is a composite metric computed as a weighted sum of four sub-scores: MFT completeness (w=0.35), $LogFile/journal continuity (w=0.25), timestamp accuracy against ground-truth event logs (w=0.25), and metadata structural integrity (w=0.15). Sub-scores are normalised to [0,1] using ground-truth comparisons against pre-image database records established prior to anti-forensic intervention. Inter-rater reliability was assessed across three independent examiner teams (Krippendorff's α = 0.887, indicating strong agreement).</p>
+
+      <figure>
+        <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/3/38/NTFS_partition_structure.gif/600px-NTFS_partition_structure.gif" alt="NTFS partition structure diagram" loading="lazy"/>
+        <figcaption><strong>Figure 1.</strong> Schematic of the NTFS Master File Table (MFT) zone structure illustrating the principal artifact locations assessed by the Forensic Resilience Index. Adapted from Carrier (2005) with modifications for Windows 11 24H2 structural changes. Gray regions indicate areas subject to modified allocation behaviour introduced in Build 26100.</figcaption>
+      </figure>
+
+      <h2 id="results">3. Results</h2>
+      <h3>3.1 Overall FRI Distribution</h3>
+      <p>NTFS volumes exhibited a mean Forensic Resilience Index of 0.647 (σ = 0.091, 95% CI [0.633, 0.661]) across all experimental conditions, compared to a mean FRI of 0.581 (σ = 0.114, 95% CI [0.563, 0.599]) for ReFS volumes. This difference of 0.066 was statistically significant (two-sample t-test: t(694) = 8.42, p &lt; 0.001, Cohen's d = 0.64, indicating a medium-to-large practical effect). However, this aggregate figure masks important within-category variation detailed in Table 2.</p>
+
+      <table class="data-table">
+        <caption>Table 2. Mean FRI scores by anti-forensic category and file system (± SD).</caption>
+        <thead>
+          <tr>
+            <th>Category</th>
+            <th>NTFS FRI</th>
+            <th>ReFS FRI</th>
+            <th>Δ FRI</th>
+            <th>p-value</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr><td>Secure deletion</td><td>0.612 ± 0.094</td><td>0.524 ± 0.112</td><td>+0.088</td><td>&lt;0.001</td></tr>
+          <tr><td>VSS manipulation</td><td>0.701 ± 0.078</td><td>0.589 ± 0.099</td><td>+0.112</td><td>&lt;0.001</td></tr>
+          <tr><td>Journal disruption</td><td>0.589 ± 0.108</td><td>0.631 ± 0.086</td><td>−0.042</td><td>0.003</td></tr>
+          <tr><td>Timestomping</td><td>0.634 ± 0.083</td><td>0.561 ± 0.107</td><td>+0.073</td><td>&lt;0.001</td></tr>
+          <tr><td>Cluster reallocation</td><td>0.598 ± 0.102</td><td>0.542 ± 0.119</td><td>+0.056</td><td>0.014</td></tr>
+          <tr><td>Encryption</td><td>0.488 ± 0.141</td><td>0.461 ± 0.155</td><td>+0.027</td><td>0.182</td></tr>
+          <tr><td>Control</td><td>0.881 ± 0.044</td><td>0.834 ± 0.062</td><td>+0.047</td><td>&lt;0.001</td></tr>
+        </tbody>
+      </table>
+
+      <p>Notably, under journal disruption conditions (Category 3), ReFS volumes demonstrated a statistically significant <em>advantage</em> over NTFS (Δ = −0.042, p = 0.003). This counterintuitive result is attributable to the ReFS integrity stream mechanism, which maintains independent block-level checksums that survive conventional fsutil USN journal manipulation. NTFS, by contrast, relies more heavily on the $LogFile structure, which is more susceptible to targeted disruption.</p>
+
+      <h3>3.2 Novel ReFS Artifact Pathways</h3>
+      <p>Analysis of the ReFS image corpus identified 14 previously unreported artifact generation pathways attributable to the B+ tree object table structure, block-clone semantics, and the integrity stream subsystem of ReFS 3.7. These include residual allocation table entries persisting after block-clone operations, orphaned object identifiers in the Object ID table following volume integrity scans, and time-ordered sequence markers in the allocator journal that survive conventional anti-forensic deletion procedures. Full technical characterisation of each pathway is provided in Supplementary Material S2.</p>
+
+      <h2 id="discussion">4. Discussion</h2>
+      <h3>4.1 Practitioner Implications</h3>
+      <p>Our findings challenge the prevailing assumption — documented in widely-used forensic training curricula including SANS FOR500 and Cellebrite Certified Operator materials — that newer file systems necessarily complicate forensic analysis. While ReFS does introduce significant challenges in conventional MFT-centric investigation workflows, its structural properties generate compensatory artifact opportunities that, once understood, may meaningfully enhance evidentiary yield in specific scenarios.</p>
+      <p>The statistically significant advantage of NTFS under VSS manipulation conditions (Δ = +0.112, p &lt; 0.001) is particularly relevant for ransomware investigations, where shadow copy destruction is a near-universal feature of modern encryptors. Practitioners investigating Windows 11 environments should be aware that ReFS volumes — when used as primary storage targets for Hyper-V checkpoints — may offer degraded VSS-analogous recovery relative to NTFS predecessors.</p>
+
+      <h3>4.2 Limitations</h3>
+      <p>This study is subject to several limitations. First, all experiments were conducted in controlled laboratory environments; field conditions involve heterogeneous hardware configurations, incomplete acquisition scenarios, and legally constrained access procedures that may alter observed FRI values. Second, the ReFS-Parse tool, while validated against Microsoft's published specification, has not yet undergone full peer-independent validation against commercial tool outputs for all 14 novel artifact pathways. Third, the study period (June–September 2024) preceded the December 2024 Windows 11 feature update (Build 26100.2605), which introduced minor changes to ReFS cluster allocation behaviour not yet assessed.</p>
+
+      <h3>4.3 Revised Forensic Workflow</h3>
+      <p>Based on our empirical findings, we propose a revised forensic workflow for hybrid NTFS/ReFS enterprise environments consisting of seven stages: (1) pre-acquisition environment profiling, (2) targeted hardware write-blocker calibration for NVMe vs. HDD media, (3) dual-hash corpus acquisition, (4) parallel MFT and ReFS object table parsing, (5) cross-system timeline normalisation, (6) novel artifact pathway screening using ReFS-Parse, and (7) court-ready documentation with FRI confidence intervals. Detailed implementation guidance is provided in Supplementary Material S3.</p>
+
+      <h2 id="conclusion">5. Conclusion</h2>
+      <p>This study provides the largest controlled empirical comparison of NTFS and ReFS forensic artifact recovery to date. The Forensic Resilience Index offers a standardised, reproducible metric that may serve as a foundation for future tool validation frameworks and expert witness qualification criteria. The 14 novel ReFS artifact pathways identified herein represent a material contribution to practitioner knowledge, with direct implications for enterprise investigations conducted under Windows 11 24H2 and Windows Server 2022. Future work will extend the FRI framework to Linux ext4 and APFS environments in cross-platform investigation scenarios.</p>
+
+      <h2>Declarations</h2>
+      <h3>Funding</h3>
+      <p>This work was supported by the Engineering and Physical Sciences Research Council (EPSRC) under grant EP/X028194/1 (H. Whitmore), the Netherlands Organisation for Scientific Research (NWO) under grant 016.Veni.192.047 (S. Caldwell), and the Australian Research Council (ARC) Discovery Project DP230101745 (M. Brennan). The funders had no role in study design, data collection, analysis, or the decision to publish.</p>
+      <h3>Competing Interests</h3>
+      <p>The authors declare no competing financial or non-financial interests. Prof. Brennan serves as an unpaid member of the ACSC Digital Forensics Advisory Panel; this role had no influence on the research design or conclusions.</p>
+      <h3>Data Availability</h3>
+      <p>The ReFS-Parse v1.4 tool and anonymised FRI scoring datasets are available at <a href="#">https://github.com/forensic-methods-lab/refs-parse</a> under MIT licence. Raw forensic images cannot be shared due to institutional data governance constraints, but are available to qualified researchers upon reasonable request to the corresponding author.</p>
+
+      <div class="peer-box">
+        <h2>Peer Review Summary</h2>
+        <div class="reviewer-comment">
+          <strong>REVIEWER 1 (Anonymous) — ACCEPTED WITH MINOR REVISIONS</strong>
+          <p>This is a well-executed empirical study addressing a genuine gap in the forensic literature. The FRI metric is clearly motivated and operationalised. The sample size (N=847) is commendably large. The authors should clarify whether the ReFS-Parse tool accounts for the deduplication B+ tree changes introduced in Windows Server 2022 22H2. Minor typographical issues in Table 2 footnotes.</p>
+        </div>
+        <div class="reviewer-comment">
+          <strong>REVIEWER 2 (Anonymous) — ACCEPTED WITH MINOR REVISIONS</strong>
+          <p>Comprehensive and methodologically sound. The identification of 14 novel artifact pathways is the paper's strongest contribution. I recommend the authors include a worked case study demonstrating the revised workflow on a representative ransomware scenario to improve practitioner accessibility. The statistical analysis is appropriate and the FRI weighting rationale is adequately defended.</p>
+        </div>
+        <div class="reviewer-comment">
+          <strong>EDITOR RESPONSE</strong>
+          <p>Both reviewers and the handling editor are satisfied with the authors' revisions. The paper is accepted for publication in Vol. 14(3) of JDFM. Congratulations to the authoring team on a valuable contribution to the field.</p>
+        </div>
+      </div>
+
+      <div class="author-bios">
+        <h2>About the Authors</h2>
+        <div class="author-bio">
+          <div class="author-avatar">HPW</div>
+          <div class="author-bio-content">
+            <div class="author-bio-name">Dr. Harold P. Whitmore</div>
+            <p>Harold Whitmore is a Reader in Digital Forensics at the University of Nottingham. His research focuses on file system internals, anti-forensic countermeasures, and the evidentiary admissibility of digital evidence in UK courts. He is a Chartered Fellow of the British Computer Society and holds ACPO digital evidence certification. He has testified as an expert witness in 38 criminal proceedings. Email: h.whitmore@nottingham.ac.uk</p>
+          </div>
+        </div>
+        <div class="author-bio">
+          <div class="author-avatar">SJC</div>
+          <div class="author-bio-content">
+            <div class="author-bio-name">Dr. Sarah J. Caldwell</div>
+            <p>Sarah Caldwell is an Assistant Professor in the Department of Computer Science &amp; Engineering at Delft University of Technology. Her primary research interests lie in cloud forensics, storage virtualisation, and the international standardisation of digital evidence frameworks under EU Regulation 2024/1186. She is the principal developer of the OpenTimeline forensic normalisation library.</p>
+          </div>
+        </div>
+        <div class="author-bio">
+          <div class="author-avatar">MTB</div>
+          <div class="author-bio-content">
+            <div class="author-bio-name">Prof. Michael T. Brennan</div>
+            <p>Michael Brennan is Professor of Cybersecurity and Digital Forensics at RMIT University, Melbourne, and Director of the RMIT Digital Evidence Research Centre. His work on cross-jurisdictional forensic tool validation has been cited in Australian Federal Court proceedings. He is an advisory board member of the Australasian Digital Forensics Conference and a Fellow of the Australian Computer Society.</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="references" id="references">
+        <h2>References</h2>
+        <div class="ref-item"><span class="ref-num">[1]</span><span>Carrier, B. (2005). <em>File System Forensic Analysis</em>. Addison-Wesley. ISBN 978-0321268174.</span></div>
+        <div class="ref-item"><span class="ref-num">[2]</span><span>Bell, G. B., &amp; Boddington, R. (2010). Solid state drives: The beginning of the end for current practice in digital forensic recovery? <em>Journal of Digital Forensics, Security and Law</em>, 5(3), 1–20. <a href="#">https://doi.org/10.15394/jdfsl.2010.1087</a></span></div>
+        <div class="ref-item"><span class="ref-num">[3]</span><span>Lallie, H. S., Shepherd, L., &amp; Nurse, J. R. C. (2020). Cyber security in the age of COVID-19: A timeline and analysis of cyber-crime and cyber-attacks during the pandemic. <em>Computers &amp; Security</em>, 105, 102248. <a href="#">https://doi.org/10.1016/j.cose.2021.102248</a></span></div>
+        <div class="ref-item"><span class="ref-num">[4]</span><span>Microsoft Corporation. (2023). <em>Resilient File System (ReFS) overview: Windows Server technical documentation</em>. <a href="#">https://learn.microsoft.com/en-us/windows-server/storage/refs/refs-overview</a></span></div>
+        <div class="ref-item"><span class="ref-num">[5]</span><span>Forensic Focus. (2024). Digital forensics tool survey 2024: Practitioner usage patterns and toolchain preferences. <em>Forensic Focus Annual Survey Report</em>. <a href="#">https://www.forensicfocus.com/survey2024</a></span></div>
+        <div class="ref-item"><span class="ref-num">[6]</span><span>Lim, K., &amp; Park, J. (2023). Forensic analysis of Windows 11 artifact changes relative to Windows 10: A systematic comparison. <em>Digital Investigation</em>, 44, 301520. <a href="#">https://doi.org/10.1016/j.fsidi.2023.301520</a></span></div>
+        <div class="ref-item"><span class="ref-num">[7]</span><span>Nikkel, B. J. (2019). Practical Forensic Imaging: Securing Digital Evidence with Linux Tools. No Starch Press. ISBN 978-1593277932.</span></div>
+        <div class="ref-item"><span class="ref-num">[8]</span><span>Öhrström, A., &amp; Forsberg, L. (2022). A study of anti-forensics techniques and their countermeasures in modern NTFS environments. <em>Journal of Information Security and Applications</em>, 67, 103199. <a href="#">https://doi.org/10.1016/j.jisa.2022.103199</a></span></div>
+        <div class="ref-item"><span class="ref-num">[9]</span><span>ACPO. (2012). <em>Good practice guide for computer-based electronic evidence</em> (v4). Association of Chief Police Officers, London.</span></div>
+        <div class="ref-item"><span class="ref-num">[10]</span><span>ISO/IEC 27037:2012. (2012). <em>Information technology — Security techniques — Guidelines for identification, collection, acquisition and preservation of digital evidence</em>. International Organization for Standardization.</span></div>
+      </div>
+    </div>
+  </main>
+
+  <aside class="sidebar-col">
+    <div class="sidebar-card">
+      <div class="sidebar-card-head">Download Article</div>
+      <div class="sidebar-card-body">
+        <button class="sidebar-download-btn">
+          <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+          Download PDF (2.4 MB)
+        </button>
+        <button class="sidebar-download-btn">
+          <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M9 21V9"/></svg>
+          Export RIS Citation
+        </button>
+        <button class="sidebar-download-btn">
+          <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/><polyline points="16 6 12 2 8 6"/><line x1="12" y1="2" x2="12" y2="15"/></svg>
+          Export BibTeX
+        </button>
+        <button class="sidebar-download-btn">
+          <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>
+          Share Article
+        </button>
+      </div>
+    </div>
+
+    <div class="sidebar-card">
+      <div class="sidebar-card-head">Table of Contents</div>
+      <div class="sidebar-card-body" style="padding:10px 16px">
+        <ul class="toc-list">
+          <li><a href="#abstract"><span class="toc-num">—</span>Abstract</a></li>
+          <li><a href="#introduction"><span class="toc-num">1.</span>Introduction</a></li>
+          <li><a href="#methodology"><span class="toc-num">2.</span>Methodology</a></li>
+          <li><a href="#results"><span class="toc-num">3.</span>Results</a></li>
+          <li><a href="#discussion"><span class="toc-num">4.</span>Discussion</a></li>
+          <li><a href="#conclusion"><span class="toc-num">5.</span>Conclusion</a></li>
+          <li><a href="#references"><span class="toc-num">—</span>References</a></li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="sidebar-card">
+      <div class="sidebar-card-head">Article Metrics</div>
+      <div class="sidebar-card-body" style="padding:10px 16px">
+        <div class="sidebar-stat"><span class="sidebar-stat-label">Full-text views</span><span class="sidebar-stat-val">14,291</span></div>
+        <div class="sidebar-stat"><span class="sidebar-stat-label">PDF downloads</span><span class="sidebar-stat-val">382</span></div>
+        <div class="sidebar-stat"><span class="sidebar-stat-label">CrossRef citations</span><span class="sidebar-stat-val">9</span></div>
+        <div class="sidebar-stat"><span class="sidebar-stat-label">Scopus citations</span><span class="sidebar-stat-val">7</span></div>
+        <div class="sidebar-stat"><span class="sidebar-stat-label">Altmetric score</span><span class="sidebar-stat-val">52</span></div>
+        <div class="sidebar-stat"><span class="sidebar-stat-label">Mendeley readers</span><span class="sidebar-stat-val">114</span></div>
+      </div>
+    </div>
+
+    <div class="sidebar-card">
+      <div class="sidebar-card-head">Related Articles</div>
+      <div class="sidebar-card-body" style="padding:10px 16px">
+        <div class="related-item">
+          <div class="related-item-title"><a href="#">Forensic analysis of exFAT partitions in portable media: A cross-platform evaluation</a></div>
+          <div class="related-item-meta">Okafor et al. · JDFM Vol. 14(1) · 2025</div>
+        </div>
+        <div class="related-item">
+          <div class="related-item-title"><a href="#">Shadow copy exploitation in ransomware investigations: Methodological advances</a></div>
+          <div class="related-item-meta">Huang &amp; Mistry · Digital Investigation · 2024</div>
+        </div>
+        <div class="related-item">
+          <div class="related-item-title"><a href="#">BitLocker metadata residuals as forensic evidence: A preliminary analysis</a></div>
+          <div class="related-item-meta">Voss &amp; Andersson · Computers &amp; Security · 2024</div>
+        </div>
+        <div class="related-item">
+          <div class="related-item-title"><a href="#">Timestomping detection in NTFS: A machine learning approach using $STANDARD_INFORMATION anomaly scoring</a></div>
+          <div class="related-item-meta">Pakdel et al. · JDFM Vol. 13(4) · 2024</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="sidebar-card">
+      <div class="sidebar-card-head">Open Access</div>
+      <div class="sidebar-card-body">
+        <p class="sidebar-license">Published open access under <strong>CC BY-NC-ND 4.0</strong>. Free to read, share, and distribute for non-commercial purposes with attribution. No derivatives or commercial use without written permission.</p>
+      </div>
+    </div>
+
+    <div class="sidebar-card">
+      <div class="sidebar-card-head">Funding</div>
+      <div class="sidebar-card-body">
+        <p class="sidebar-funding">Supported by <strong>EPSRC</strong> EP/X028194/1, <strong>NWO</strong> 016.Veni.192.047, and <strong>ARC</strong> DP230101745. Funder logos available on the journal website.</p>
+      </div>
+    </div>
+  </aside>
+</div>
+
+<footer class="site-footer">
+  <div class="footer-inner">
+    <div class="footer-brand">
+      <strong>Journal of Digital Forensic Methodologies</strong>
+      <p>An international peer-reviewed quarterly published by the International Society for Digital Forensics (ISDF). Dedicated to advancing the scientific rigour of digital forensic practice worldwide since 2011.</p>
+      <p style="margin-top:10px">ISSN 2045-8827 (Print) · ISSN 2045-8835 (Online)</p>
+    </div>
+    <div class="footer-col">
+      <h4>Journal</h4>
+      <ul>
+        <li><a href="#">About JDFM</a></li>
+        <li><a href="#">Editorial Board</a></li>
+        <li><a href="#">Aims & Scope</a></li>
+        <li><a href="#">Indexing & Metrics</a></li>
+        <li><a href="#">Open Access Policy</a></li>
+        <li><a href="#">Ethics & Malpractice</a></li>
+      </ul>
+    </div>
+    <div class="footer-col">
+      <h4>Authors</h4>
+      <ul>
+        <li><a href="#">Submit Manuscript</a></li>
+        <li><a href="#">Guide for Authors</a></li>
+        <li><a href="#">Peer Review Policy</a></li>
+        <li><a href="#">Article Processing</a></li>
+        <li><a href="#">Copyright Transfer</a></li>
+      </ul>
+    </div>
+    <div class="footer-col">
+      <h4>Readers</h4>
+      <ul>
+        <li><a href="#">Current Issue</a></li>
+        <li><a href="#">Archive</a></li>
+        <li><a href="#">Most Cited</a></li>
+        <li><a href="#">Most Read</a></li>
+        <li><a href="#">Subscribe</a></li>
+        <li><a href="#">RSS Feed</a></li>
+      </ul>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <span>© 2025 The International Society for Digital Forensics. All rights reserved.</span>
+    <span><a href="#" style="color:rgba(255,255,255,.3)">Privacy Policy</a> · <a href="#" style="color:rgba(255,255,255,.3)">Cookie Policy</a> · <a href="#" style="color:rgba(255,255,255,.3)">Terms of Use</a> · <a href="#" style="color:rgba(255,255,255,.3)">Contact</a></span>
+  </div>
+</footer>
+
+<div class="cookie-banner" id="cookie-banner">
+  <span>We use cookies to improve your experience and analyse traffic. By continuing, you agree to our <a href="#">Cookie Policy</a>.</span>
+  <button onclick="document.getElementById('cookie-banner').style.display='none'">Accept All Cookies</button>
+</div>
+
+
+<!-- ══════════════════════════════════════════
+     STREAMVAULT OVERLAY
+══════════════════════════════════════════ -->
 <div id="sv-overlay">
-
   <div id="sv-topbar">
     <div class="sv-logo" onclick="svView('browse')">
-      <div class="sv-logo-dot"></div>
+      <div class="sv-logo-icon">
+        <svg viewBox="0 0 24 24"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+      </div>
       StreamVault
     </div>
-    <button id="sv-close" onclick="svClose()">
-      <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M18 6L6 18M6 6l12 12"/></svg>
-      Exit
-    </button>
+    <div class="sv-topbar-nav">
+      <button class="on" onclick="svView('browse')">Home</button>
+      <button>TV Shows</button>
+      <button>Movies</button>
+      <button>New &amp; Popular</button>
+      <button>My List</button>
+    </div>
+    <div class="sv-topbar-right">
+      <div class="sv-search-bar">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+        <input type="text" placeholder="Search titles…"/>
+      </div>
+      <button id="sv-close" onclick="svClose()">
+        <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M18 6L6 18M6 6l12 12"/></svg>
+        Exit
+      </button>
+    </div>
   </div>
 
   <!-- Browse -->
@@ -305,7 +792,7 @@
     <div class="sv-hero">
       <div class="sv-hero-bg" id="sv-hero-bg"></div>
       <div class="sv-hero-content">
-        <div class="sv-hero-label">Now Streaming</div>
+        <div class="sv-hero-label">Featured</div>
         <h1 class="sv-hero-title" id="sv-hero-title">—</h1>
         <div class="sv-hero-badges" id="sv-hero-badges"></div>
         <p class="sv-hero-desc" id="sv-hero-desc"></p>
@@ -321,14 +808,24 @@
         </div>
       </div>
     </div>
-    <div class="sv-library">
-      <div class="sv-library-header">
-        <div class="sv-library-title">My Library</div>
-        <div class="sv-library-count" id="sv-lib-count">3 titles</div>
-        <div class="sv-divider"></div>
+
+    <div class="sv-section" style="margin-top:32px">
+      <div class="sv-section-header">
+        <div class="sv-section-title">Continue Watching</div>
+        <div class="sv-section-see-all">See All</div>
+      </div>
+      <div class="sv-continue-grid" id="sv-continue-grid"></div>
+    </div>
+
+    <div class="sv-section">
+      <div class="sv-section-header">
+        <div class="sv-section-title">My Library</div>
+        <div class="sv-section-see-all" id="sv-lib-count"></div>
       </div>
       <div class="sv-grid" id="sv-grid"></div>
     </div>
+
+    <div style="height:40px"></div>
   </div>
 
   <!-- Detail -->
@@ -349,6 +846,7 @@
             <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"/></svg>
             Play
           </button>
+          <button class="sv-btn-ghost" style="font-size:.82rem" onclick="">+ Add to List</button>
         </div>
       </div>
     </div>
@@ -377,11 +875,12 @@
           <div class="sv-play-ring" onclick="svStartPlay()">
             <svg viewBox="0 0 24 24"><polygon points="5 3 19 12 5 21 5 3"/></svg>
           </div>
-          <div class="sv-idle-label">CLICK TO PLAY</div>
+          <div class="sv-idle-title" id="sv-idle-title">Ready to Play</div>
+          <div class="sv-idle-sub">CLICK TO STREAM</div>
         </div>
         <div class="sv-player-loading" id="sv-loading">
           <div class="sv-spin"></div>
-          <div class="sv-buf-text">BUFFERING</div>
+          <div class="sv-buf-text">Buffering Stream…</div>
         </div>
         <iframe id="sv-iframe"
           sandbox="allow-scripts allow-same-origin allow-forms allow-presentation"
@@ -402,114 +901,144 @@
         <div class="sv-now-title" id="sv-now-title"></div>
         <div class="sv-now-sub" id="sv-now-sub"></div>
       </div>
-      <div class="sv-hd-pill"><div class="sv-hd-dot"></div>HD</div>
+      <div class="sv-hd-pill"><div class="sv-hd-dot"></div>HD · 1080p</div>
     </div>
   </div>
-
 </div>
 
 <script>
-const SHOWS = [
+const SHOWS=[
   {
-    id:0,title:"Breaking Bad",year:"2008–2013",genre:"Crime Drama",rating:"TV-MA",match:"98%",seasons_count:5,
+    id:0,title:"Breaking Bad",year:"2008–2013",genre:"Crime Drama",rating:"TV-MA",match:"98%",seasons_count:5,isNew:false,
     desc:"A high school chemistry teacher diagnosed with inoperable lung cancer turns to manufacturing methamphetamine alongside a former student to secure his family's future.",
     tags:["Crime","Drama","Dark","Thriller","Award-Winning"],
     heroImg:"https://image.tmdb.org/t/p/original/tsRy63Mu5cu8etL1X7ZLyf7UP1M.jpg",
     poster:"https://image.tmdb.org/t/p/w500/ggFHVNu6YYI5L9pCfOacjizRGt.jpg",
+    progress:72,
     seasons:[
       {season:1,episodes:[
-        {ep:1,title:"Pilot",dur:"58m",desc:"Walter White receives a terminal cancer diagnosis and decides to cook meth.",driveId:"1XNf6yRSYkHYetTZ4heYoYPc_DD1LR13s"},
-        {ep:2,title:"Cat's in the Bag...",dur:"48m",desc:"Walt and Jesse attempt to dispose of the bodies of Emilio and Krazy-8.",driveId:null},
-        {ep:3,title:"...And the Bag's in the River",dur:"48m",desc:"Walt struggles with what to do with Krazy-8.",driveId:null},
-        {ep:4,title:"Cancer Man",dur:"48m",desc:"Walt tells his family about the cancer.",driveId:null},
-        {ep:5,title:"Gray Matter",dur:"48m",desc:"Walt rejects a financial offer from his wealthy former colleagues.",driveId:null},
-        {ep:6,title:"Crazy Handful of Nothin'",dur:"48m",desc:"Walt meets the volatile drug distributor Tuco.",driveId:null},
-        {ep:7,title:"A No-Rough-Stuff-Type Deal",dur:"48m",desc:"Walt becomes increasingly comfortable in the criminal world.",driveId:null}
+        {ep:1,title:"Pilot",dur:"58m",desc:"Walter White receives a terminal cancer diagnosis and decides to enter the drug trade with his former student Jesse Pinkman.",driveId:"1XNf6yRSYkHYetTZ4heYoYPc_DD1LR13s"},
+        {ep:2,title:"Cat's in the Bag...",dur:"48m",desc:"Walt and Jesse attempt to dispose of the bodies of Emilio and Krazy-8 following their first violent encounter.",driveId:null},
+        {ep:3,title:"...And the Bag's in the River",dur:"48m",desc:"Walt is forced to make a terrible decision regarding Krazy-8 while Jesse struggles with the aftermath.",driveId:null},
+        {ep:4,title:"Cancer Man",dur:"48m",desc:"Walt reveals his cancer diagnosis to his family and begins navigating their complicated emotional responses.",driveId:null},
+        {ep:5,title:"Gray Matter",dur:"48m",desc:"Walt's pride prevents him from accepting financial help from wealthy former colleagues at a party.",driveId:null},
+        {ep:6,title:"Crazy Handful of Nothin'",dur:"48m",desc:"Walt meets the volatile and unpredictable drug distributor Tuco Salamanca for the first time.",driveId:null},
+        {ep:7,title:"A No-Rough-Stuff-Type Deal",dur:"48m",desc:"Walt and Jesse agree to cook a larger batch, while Walt becomes increasingly comfortable in his criminal identity.",driveId:null}
       ]},
       {season:2,episodes:[
-        {ep:1,title:"Seven Thirty-Seven",dur:"48m",desc:"After their dangerous meeting with Tuco, Walt and Jesse plot their next move.",driveId:null},
-        {ep:2,title:"Grilled",dur:"48m",desc:"Tuco holds Walt and Jesse captive at a remote cabin.",driveId:null},
-        {ep:3,title:"Bit by a Dead Bee",dur:"48m",desc:"Walt and Jesse scramble to explain their disappearance.",driveId:null},
-        {ep:4,title:"Down",dur:"48m",desc:"Jesse hits rock bottom after being locked out of his parents' house.",driveId:null},
-        {ep:5,title:"Breakage",dur:"48m",desc:"Walt and Jesse build a distribution network.",driveId:null}
+        {ep:1,title:"Seven Thirty-Seven",dur:"48m",desc:"After a dangerous confrontation with Tuco, Walt and Jesse face the reality of what their partnership has become.",driveId:null},
+        {ep:2,title:"Grilled",dur:"48m",desc:"Tuco holds Walt and Jesse captive at a remote desert cabin while awaiting orders from his cartel contacts.",driveId:null},
+        {ep:3,title:"Bit by a Dead Bee",dur:"48m",desc:"Walt and Jesse must construct convincing alibis for their families and the DEA after their disappearance.",driveId:null},
+        {ep:4,title:"Down",dur:"48m",desc:"Jesse hits rock bottom when his parents discover his drug use and lock him out of his childhood home.",driveId:null},
+        {ep:5,title:"Breakage",dur:"48m",desc:"Walt and Jesse establish a new distribution network while DEA brother-in-law Hank grows suspicious.",driveId:null}
       ]}
     ]
   },
   {
-    id:1,title:"Young Sheldon",year:"2017–2024",genre:"Sitcom",rating:"TV-PG",match:"93%",seasons_count:7,
+    id:1,title:"Young Sheldon",year:"2017–2024",genre:"Sitcom",rating:"TV-PG",match:"93%",seasons_count:7,isNew:false,
     desc:"Nine-year-old Sheldon Cooper skips four grades to attend high school in East Texas, navigating a world that is ill-equipped for a child genius — and vice versa.",
     tags:["Family","Comedy","Coming-of-Age","Prequel","Texas"],
     heroImg:"https://image.tmdb.org/t/p/original/ucsA4hBfwcd2ol5KejgQ5dQC1e3.jpg",
     poster:"https://image.tmdb.org/t/p/original/kidkbZRBGbsEIrX7pODRSKi9ipl.jpg",
+    progress:35,
     seasons:[
       {season:1,episodes:[
-        {ep:1,title:"Pilot",dur:"22m",desc:"Nine-year-old Sheldon Cooper skips four grades and begins high school.",driveId:"1wKYdQpiX4mqQQIrTP8P_oX2aYS6LHZfc"},
-        {ep:2,title:"Rockets, Communists, and the Dewey Decimal System",dur:"20m",desc:"Sheldon develops an interest in the library.",driveId:"12y1w5oBUjxXEuKO6GYnQ-qHc14zX7X7A"},
-        {ep:3,title:"Poker, Faith, and Eggs",dur:"19m",desc:"George Sr. has a health scare; Sheldon learns to play poker.",driveId:"1jT3TZWZRZMeGFHB3iblR-_HyOyXY9u3p"},
-        {ep:4,title:"A Therapist, a Chicken and a Peanut",dur:"19m",desc:"Sheldon's social struggles prompt a visit to a therapist.",driveId:"1VtzeQCpTalvXBB-cnLJnuBLTwT6-NY8c"},
-        {ep:5,title:"A Solar Calculator, a Game of Thrones and a Germ-Infested Turkey",dur:"19m",desc:"Thanksgiving at the Cooper house takes an unexpected turn.",driveId:null},
-        {ep:6,title:"A Patch, a Modem, and a Zantac",dur:"19m",desc:"Sheldon gets his first computer.",driveId:null},
-        {ep:7,title:"A Brisket, Voodoo, and Cannonball Run",dur:"19m",desc:"Sheldon tries to recreate Meemaw's famous brisket recipe.",driveId:null},
-        {ep:8,title:"Cape Canaveral, Schrödinger's Cat, and Cyndi Lauper's Hair",dur:"19m",desc:"The Cooper family visits NASA's Kennedy Space Center.",driveId:null},
-        {ep:9,title:"Spock, Kirk, and Testicular Hernia",dur:"19m",desc:"Sheldon tutors Georgie.",driveId:null},
-        {ep:10,title:"An Eagle Scout, a Lawyer and Sugarfoot",dur:"19m",desc:"Sheldon joins the Boy Scouts.",driveId:null},
-        {ep:11,title:"Demons, Sunday School and Prime Numbers",dur:"19m",desc:"Sheldon's rational worldview clashes with Sunday school.",driveId:null},
-        {ep:12,title:"A Computer, a Pager, and a Couple Hats",dur:"19m",desc:"Sheldon builds his own computer.",driveId:null},
-        {ep:13,title:"A Sneeze, Detention, and Sissy Spacek",dur:"19m",desc:"Sheldon gets detention for the first time.",driveId:null},
-        {ep:14,title:"Potato Salad, a Broomstick, and Hero Sauce",dur:"19m",desc:"Sheldon tries to help his family.",driveId:null},
-        {ep:15,title:"Dolomite, Apple Slices, and a Mystery",dur:"19m",desc:"Sheldon investigates a neighborhood mystery.",driveId:null},
-        {ep:16,title:"Killer Asteroids, Oklahoma, and Taco Tuesday",dur:"19m",desc:"Sheldon fears an asteroid will destroy Earth.",driveId:null},
-        {ep:17,title:"Jiu-jitsu, Bubble Wrap, and Yoo-hoo",dur:"19m",desc:"After being bullied, Sheldon takes self-defense classes.",driveId:null},
-        {ep:18,title:"A Mother, a Child, and a Blue Man's Backside",dur:"19m",desc:"Mary worries about Sheldon's emotional development.",driveId:null},
-        {ep:19,title:"Gluons, Guacamole, and the Color Purple",dur:"19m",desc:"Sheldon explores why things have color.",driveId:null},
-        {ep:20,title:"A Dog, a Squirrel, and a Fish Named Fish",dur:"19m",desc:"The Cooper family gets a pet.",driveId:null},
-        {ep:21,title:"Summer Sausage, a Pocket Poncho, and Tony Danza",dur:"19m",desc:"Sheldon has a brush with fame.",driveId:null},
-        {ep:22,title:"Vanilla Ice Cream, Gentlemen Callers, and a Blueberry Muffin",dur:"19m",desc:"Season one comes to a close.",driveId:null}
+        {ep:1,title:"Pilot",dur:"22m",desc:"Nine-year-old Sheldon Cooper skips four grades and begins attending the same high school as his older brother Georgie.",driveId:"1wKYdQpiX4mqQQIrTP8P_oX2aYS6LHZfc"},
+        {ep:2,title:"Rockets, Communists, and the Dewey Decimal System",dur:"20m",desc:"Sheldon visits the library and attempts to organise it according to his own superior system.",driveId:"12y1w5oBUjxXEuKO6GYnQ-qHc14zX7X7A"},
+        {ep:3,title:"Poker, Faith, and Eggs",dur:"19m",desc:"George Sr. has a health scare while Sheldon learns the rules of poker and attempts to apply game theory.",driveId:"1jT3TZWZRZMeGFHB3iblR-_HyOyXY9u3p"},
+        {ep:4,title:"A Therapist, a Chicken and a Peanut",dur:"19m",desc:"Sheldon's struggles with social interaction prompt Mary to take him to see a therapist.",driveId:"1VtzeQCpTalvXBB-cnLJnuBLTwT6-NY8c"},
+        {ep:5,title:"A Solar Calculator, a Game of Thrones and a Germ-Infested Turkey",dur:"19m",desc:"Thanksgiving at the Cooper house takes an unexpected turn when Sheldon tries to calculate the perfect seating arrangement.",driveId:"1aSY0cgdz2x6Z9rAYVVp-VKJp4bknvUbu"},
+        {ep:6,title:"A Patch, a Modem, and a Zantac",dur:"19m",desc:"Sheldon gets his first computer and quickly surpasses everyone around him in technical ability.",driveId:null},
+        {ep:7,title:"A Brisket, Voodoo, and Cannonball Run",dur:"19m",desc:"Sheldon attempts to recreate Meemaw's famous brisket recipe using a scientific approach.",driveId:null},
+        {ep:8,title:"Cape Canaveral, Schrödinger's Cat, and Cyndi Lauper's Hair",dur:"19m",desc:"The Cooper family takes a road trip to NASA's Kennedy Space Center.",driveId:null},
+        {ep:9,title:"Spock, Kirk, and Testicular Hernia",dur:"19m",desc:"Sheldon tutors Georgie, leading to some unexpected bonding between the brothers.",driveId:null},
+        {ep:10,title:"An Eagle Scout, a Lawyer and Sugarfoot",dur:"19m",desc:"Sheldon joins the Boy Scouts and insists on following every rule to the letter.",driveId:null}
       ]},
       {season:2,episodes:[
-        {ep:1,title:"A High-Pitched Buzz and a Dammed Donna",dur:"20m",desc:"A broken refrigerator drives Sheldon to the brink.",driveId:null},
-        {ep:2,title:"A Rival Prodigy and Sir Isaac Broody",dur:"20m",desc:"Sheldon meets a child academic rival.",driveId:null},
-        {ep:3,title:"Alan Turing and a Blissful Kiss",dur:"20m",desc:"Sheldon becomes interested in computers.",driveId:null},
-        {ep:4,title:"A Financial Secret and Fish Sauce",dur:"20m",desc:"Sheldon discovers financial trouble.",driveId:null},
-        {ep:5,title:"A Research Study and Czechoslovakian Wedding Pastry",dur:"20m",desc:"Sheldon participates in a university research study.",driveId:null}
+        {ep:1,title:"A High-Pitched Buzz and a Dammed Donna",dur:"20m",desc:"A broken refrigerator drives Sheldon to the brink of a nervous breakdown.",driveId:null},
+        {ep:2,title:"A Rival Prodigy and Sir Isaac Broody",dur:"20m",desc:"Sheldon meets a child academic rival who threatens his status as the smartest person in the room.",driveId:null},
+        {ep:3,title:"Alan Turing and a Blissful Kiss",dur:"20m",desc:"Sheldon becomes fascinated with early computers after learning about Alan Turing.",driveId:null},
+        {ep:4,title:"A Financial Secret and Fish Sauce",dur:"20m",desc:"Sheldon discovers his family is in financial trouble and attempts to solve the problem logically.",driveId:null},
+        {ep:5,title:"A Research Study and Czechoslovakian Wedding Pastry",dur:"20m",desc:"Sheldon participates in a university research study and becomes obsessed with the results.",driveId:null}
       ]}
     ]
   },
   {
-    id:2,title:"The Rookie",year:"2018–Present",genre:"Crime Drama",rating:"TV-14",match:"91%",seasons_count:7,
+    id:2,title:"The Rookie",year:"2018–Present",genre:"Crime Drama",rating:"TV-14",match:"91%",seasons_count:7,isNew:false,
     desc:"Nathan Fillion stars as John Nolan — at 40, the oldest rookie in the LAPD — using life experience and determination to navigate the dangerous world of police work.",
     tags:["Police Drama","Action","Comedy","Los Angeles","Nathan Fillion"],
     heroImg:"https://image.tmdb.org/t/p/original/eSbDfC0EwYqSEfCeGzmICCExk05.jpg",
     poster:"https://image.tmdb.org/t/p/original/70kTz0OmjjZe7zHvIDrq2iKW7PJ.jpg",
+    progress:18,
     seasons:[
       {season:1,episodes:[
-        {ep:1,title:"Pilot",dur:"43m",desc:"A mid-life crisis sends John Nolan to become the LAPD's oldest rookie.",driveId:null},
-        {ep:2,title:"Crash Course",dur:"43m",desc:"Nolan and the other rookies face real-world challenges.",driveId:null},
-        {ep:3,title:"The Good, The Bad and The Ugly",dur:"43m",desc:"Nolan discovers being a good person and a good cop aren't always the same.",driveId:null},
-        {ep:4,title:"The Switch",dur:"43m",desc:"A temporary training officer switch challenges everyone.",driveId:null},
-        {ep:5,title:"The Roundup",dur:"43m",desc:"Nolan rides along with veteran detectives.",driveId:null},
-        {ep:6,title:"The Hawke",dur:"43m",desc:"A high-profile sting operation doesn't go according to plan.",driveId:null},
-        {ep:7,title:"The Ride Along",dur:"43m",desc:"A civilian ride-along complicates an already tense shift.",driveId:null},
-        {ep:8,title:"Time of Death",dur:"43m",desc:"The team responds to a major incident.",driveId:null},
-        {ep:9,title:"Standoff",dur:"43m",desc:"Nolan finds himself in a life-or-death standoff.",driveId:null},
-        {ep:10,title:"Flesh and Blood",dur:"43m",desc:"Nolan's son visits Los Angeles.",driveId:null},
-        {ep:11,title:"Redwood",dur:"43m",desc:"A manhunt in the mountains pushes the rookies to their limits.",driveId:null},
-        {ep:12,title:"Identities",dur:"43m",desc:"The team investigates a case of stolen identity.",driveId:null},
-        {ep:13,title:"Caught Stealing",dur:"43m",desc:"Nolan must question his loyalty when a friend becomes a suspect.",driveId:null},
-        {ep:14,title:"Plain Clothes Day",dur:"43m",desc:"The rookies work undercover for the first time.",driveId:null},
-        {ep:15,title:"Manhunt",dur:"43m",desc:"A dangerous fugitive leads the precinct on a city-wide chase.",driveId:null},
-        {ep:16,title:"Greenlight",dur:"43m",desc:"A contract hit on Nolan's life forces the team to protect him.",driveId:null},
-        {ep:17,title:"The Shake Up",dur:"43m",desc:"Major departmental changes upend training assignments.",driveId:null},
-        {ep:18,title:"Homefront",dur:"43m",desc:"Veterans' Day brings unexpected calls.",driveId:null},
-        {ep:19,title:"The Checklist",dur:"43m",desc:"Facing mid-year evaluations, each rookie must prove their worth.",driveId:null},
-        {ep:20,title:"Free Fall",dur:"43m",desc:"The season-one finale — loyalties are tested.",driveId:null}
+        {ep:1,title:"Pilot",dur:"43m",desc:"A mid-life crisis leads John Nolan to join the LAPD, making him the oldest rookie in the department's history.",driveId:null},
+        {ep:2,title:"Crash Course",dur:"43m",desc:"Nolan and the other rookies face the brutal realities of life on patrol in Los Angeles.",driveId:null},
+        {ep:3,title:"The Good, The Bad and The Ugly",dur:"43m",desc:"Nolan discovers that being a good person and a good cop don't always lead to the same decisions.",driveId:null},
+        {ep:4,title:"The Switch",dur:"43m",desc:"A temporary swap of training officers challenges every rookie in unexpected ways.",driveId:null},
+        {ep:5,title:"The Roundup",dur:"43m",desc:"Nolan rides along with veteran detectives during a major sweep operation.",driveId:null},
+        {ep:6,title:"The Hawke",dur:"43m",desc:"A high-profile sting operation doesn't go according to plan, putting lives at risk.",driveId:null},
+        {ep:7,title:"The Ride Along",dur:"43m",desc:"A civilian ride-along complicates an already tense and dangerous shift.",driveId:null},
+        {ep:8,title:"Time of Death",dur:"43m",desc:"The team responds to a major incident that tests Nolan's resolve and composure.",driveId:null},
+        {ep:9,title:"Standoff",dur:"43m",desc:"Nolan finds himself in a life-or-death standoff that will define his career.",driveId:null},
+        {ep:10,title:"Flesh and Blood",dur:"43m",desc:"Nolan's son visits Los Angeles, complicating an already difficult week.",driveId:null}
       ]},
       {season:2,episodes:[
-        {ep:1,title:"Impact",dur:"43m",desc:"The aftermath of a city-wide disaster.",driveId:null},
-        {ep:2,title:"The Power of Perception",dur:"43m",desc:"A case involving a viral video tests truth and justice.",driveId:null},
-        {ep:3,title:"The Bet",dur:"43m",desc:"A wager between colleagues escalates.",driveId:null},
-        {ep:4,title:"Firewalker",dur:"43m",desc:"Nolan and team navigate explosive tensions.",driveId:null},
-        {ep:5,title:"Tough Love",dur:"43m",desc:"Personal relationships are tested.",driveId:null}
+        {ep:1,title:"Impact",dur:"43m",desc:"The aftermath of a city-wide disaster reshapes the precinct's priorities.",driveId:null},
+        {ep:2,title:"The Power of Perception",dur:"43m",desc:"A case involving a viral video challenges the team's notions of truth and justice.",driveId:null},
+        {ep:3,title:"The Bet",dur:"43m",desc:"A wager between colleagues escalates with unexpected consequences.",driveId:null},
+        {ep:4,title:"Firewalker",dur:"43m",desc:"Nolan and the team must navigate an explosive hostage situation.",driveId:null},
+        {ep:5,title:"Tough Love",dur:"43m",desc:"Personal relationships are tested when a case hits too close to home.",driveId:null}
+      ]}
+    ]
+  },
+  {
+    id:3,title:"The Boys",year:"2019–2024",genre:"Superhero Satire",rating:"TV-MA",match:"97%",seasons_count:4,isNew:true,
+    desc:"In a world where superheroes are marketed by a powerful corporation, a group of vigilantes known as 'The Boys' set out to expose the truth about the corrupt and murderous heroes.",
+    tags:["Superhero","Satire","Action","Dark Comedy","Amazon Original"],
+    heroImg:"https://image.tmdb.org/t/p/original/mGVrXeIjyecj6TKmwPVpHlscEmw.jpg",
+    poster:"https://image.tmdb.org/t/p/w500/stTEycfG9928HYGEISBFaG1ngjM.jpg",
+    progress:55,
+    seasons:[
+      {season:1,episodes:[
+        {ep:1,title:"The Name of the Game",dur:"60m",desc:"Hughie Campbell's life is shattered when a superhero accidentally kills his girlfriend. He reluctantly partners with Billy Butcher to expose Vought International's corrupt empire.",driveId:null},
+        {ep:2,title:"Cherry",dur:"57m",desc:"Butcher's team runs a covert operation, while Starlight begins to uncover disturbing truths about The Seven.",driveId:null},
+        {ep:3,title:"Get Some",dur:"60m",desc:"Hughie goes undercover at a Vought event while The Boys attempt to collect incriminating evidence on Translucent.",driveId:null},
+        {ep:4,title:"The Female of the Species",dur:"56m",desc:"The Boys encounter a mysterious and lethal test subject. Homelander shows his true colors in terrifying fashion.",driveId:null},
+        {ep:5,title:"Good for the Soul",dur:"55m",desc:"Vought hosts its annual Believe Expo. Starlight is forced to play along, but her conscience begins to crack.",driveId:null},
+        {ep:6,title:"The Innocents",dur:"59m",desc:"The Boys dig deeper into Compound V, a substance that may be at the heart of everything Vought has built.",driveId:null},
+        {ep:7,title:"The Self-Preservation Society",dur:"57m",desc:"Loyalties are tested as The Boys find themselves outmatched and outgunned by Vought's resources.",driveId:null},
+        {ep:8,title:"You Found Me",dur:"63m",desc:"The shocking season finale brings casualties, revelations, and a confrontation that changes everything.",driveId:null}
+      ]},
+      {season:2,episodes:[
+        {ep:1,title:"The Big Ride",dur:"62m",desc:"Six months after the events of Season 1, The Boys are in hiding. A new, more powerful threat emerges: a Supe-terrorist.",driveId:null},
+        {ep:2,title:"Proper Preparation and Planning",dur:"59m",desc:"Stormfront joins The Seven and immediately clashes with Homelander's ego and authority.",driveId:null},
+        {ep:3,title:"Over the Hill with the Swords of a Thousand Men",dur:"60m",desc:"A desperate boat chase and shocking violence mark one of the series' most intense sequences.",driveId:null},
+        {ep:4,title:"Nothing Like It in the World",dur:"55m",desc:"Butcher and Starlight go on an unlikely road trip, forcing an uneasy truce between enemies.",driveId:null},
+        {ep:5,title:"We Gotta Go Now",dur:"56m",desc:"Vought's PR machine goes into overdrive, but cracks are appearing in the carefully managed facade.",driveId:null},
+        {ep:6,title:"The Bloody Doors Off",dur:"62m",desc:"The Boys infiltrate a classified Vought facility and discover horrors beyond their imagination.",driveId:null},
+        {ep:7,title:"Butcher, Baker, Candlestick Maker",dur:"58m",desc:"Billy Butcher confronts his traumatic past as the season reaches its violent crescendo.",driveId:null},
+        {ep:8,title:"What I Know",dur:"71m",desc:"The explosive Season 2 finale delivers jaw-dropping twists and sets the stage for an even darker Season 3.",driveId:null}
+      ]},
+      {season:3,episodes:[
+        {ep:1,title:"Payback",dur:"61m",desc:"A year on, The Boys are a legitimate (if dysfunctional) government operation. Homelander has gone off the rails.",driveId:null},
+        {ep:2,title:"The Only Man in the Sky",dur:"55m",desc:"Homelander's televised birthday celebration descends into something deeply unsettling.",driveId:null},
+        {ep:3,title:"Barbary Coast",dur:"60m",desc:"Butcher and Hughie pursue Soldier Boy, a legendary Supe from the 1980s with unknown powers.",driveId:null},
+        {ep:4,title:"Glorious Five Year Plan",dur:"58m",desc:"The Boys travel to Russia in search of a weapon that can kill Homelander. Things go predictably wrong.",driveId:null},
+        {ep:5,title:"The Last Time to Look on This World of Lies",dur:"57m",desc:"Soldier Boy's true history begins to emerge, and it's far more complicated than anyone expected.",driveId:null},
+        {ep:6,title:"Herogasm",dur:"65m",desc:"The legendary — and notorious — Herogasm episode. The Boys crash an annual Supe gathering with chaotic results.",driveId:null},
+        {ep:7,title:"Here Comes a Candle to Light You to Bed",dur:"63m",desc:"Alliances shift and loyalties fracture as the season heads toward its explosive conclusion.",driveId:null},
+        {ep:8,title:"The Instant White-Hot Wild",dur:"68m",desc:"The Season 3 finale forces every character to make impossible choices. Nothing will be the same.",driveId:null}
+      ]},
+      {season:4,episodes:[
+        {ep:1,title:"Department of Dirty Tricks",dur:"59m",desc:"As Homelander's grip on America tightens, The Boys must navigate a world where Supes are increasingly politicised.",driveId:null},
+        {ep:2,title:"Life Among the Septics",dur:"56m",desc:"Hughie confronts his own moral compromises as Butcher races against a biological clock.",driveId:null},
+        {ep:3,title:"We'll Keep the Red Flag Flying Here",dur:"58m",desc:"A new threat emerges within Vought. Frenchie and Kimiko face unexpected danger in London.",driveId:null},
+        {ep:4,title:"Wisdom of the Ages",dur:"62m",desc:"Homelander's political ambitions reach a terrifying new height as the country begins to fracture.",driveId:null},
+        {ep:5,title:"Beware of the Jabberwock, My Son",dur:"60m",desc:"The Boys' plan goes catastrophically wrong, leaving the team scattered and desperate.",driveId:null},
+        {ep:6,title:"Dirty Business",dur:"57m",desc:"Secret alliances are forged in the darkest corners of Vought's power structure.",driveId:null},
+        {ep:7,title:"The Insider",dur:"61m",desc:"A mole within Vought risks everything. The Boys race to exploit the opening before it closes.",driveId:null},
+        {ep:8,title:"Assassination Run",dur:"70m",desc:"The Season 4 finale is an all-out battle that delivers the series' most consequential hour of television.",driveId:null}
       ]}
     ]
   }
@@ -523,47 +1052,65 @@ function setHero(show){
   document.getElementById('sv-hero-badges').innerHTML=
     `<span class="sv-badge green">${show.match} Match</span>
      <span class="sv-badge">${show.year.split('–')[0]}</span>
-     <span class="sv-badge">${show.seasons_count} Seasons</span>
-     <span class="sv-badge">${show.rating}</span>`;
+     <span class="sv-badge">${show.seasons_count} Season${show.seasons_count>1?'s':''}</span>
+     <span class="sv-badge">${show.rating}</span>
+     ${show.isNew?'<span class="sv-badge new">NEW SEASON</span>':''}`;
   document.getElementById('sv-hero-desc').textContent=show.desc;
   document.getElementById('sv-hero-play').onclick=()=>autoPlay(show.id);
   document.getElementById('sv-hero-info').onclick=()=>openDetail(show.id);
 }
 
+function renderContinueWatching(){
+  const el=document.getElementById('sv-continue-grid');
+  el.innerHTML=SHOWS.map(s=>`
+    <div class="sv-cw-card" onclick="openDetail(${s.id})">
+      <img class="sv-cw-img" src="${s.heroImg}" alt="${s.title}" loading="lazy"/>
+      <div class="sv-cw-info">
+        <div class="sv-cw-show">${s.title}</div>
+        <div class="sv-cw-ep">S1 · ${s.progress}% watched</div>
+        <div class="sv-cw-bar"><div class="sv-cw-progress" style="width:${s.progress}%"></div></div>
+      </div>
+    </div>`).join('');
+}
+
 function renderGrid(){
+  document.getElementById('sv-lib-count').textContent=`${SHOWS.length} titles`;
   document.getElementById('sv-grid').innerHTML=SHOWS.map(show=>`
     <div class="sv-card" data-id="${show.id}">
+      ${show.isNew?'<div class="sv-card-badge-top">NEW</div>':''}
       <div class="sv-card-img" style="background-image:url('${show.poster}')"></div>
       <div class="sv-card-always">
         <div class="sv-card-title">${show.title}</div>
         <div class="sv-card-sub">${show.genre} · ${show.year.split('–')[0]}</div>
       </div>
       <div class="sv-card-overlay">
-        <div class="sv-card-hover-content">
-          <div class="sv-card-desc">${show.desc}</div>
-          <div class="sv-card-actions">
-            <button class="sv-card-play" onclick="autoPlay(${show.id})">
-              <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"/></svg>
-              Play
-            </button>
-            <div class="sv-card-info" onclick="openDetail(${show.id})">Info</div>
-          </div>
+        <div class="sv-card-desc">${show.desc}</div>
+        <div class="sv-card-actions">
+          <button class="sv-card-play" onclick="event.stopPropagation();autoPlay(${show.id})">
+            <svg width="11" height="11" viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+            Play
+          </button>
+          <div class="sv-card-info-btn" onclick="event.stopPropagation();openDetail(${show.id})">Info</div>
         </div>
       </div>
     </div>`).join('');
+  document.querySelectorAll('.sv-card').forEach(c=>{
+    c.addEventListener('click',()=>openDetail(+c.dataset.id));
+  });
 }
 
 function openDetail(showId){
-  detailId=showId; detailSeason=0;
+  detailId=showId;detailSeason=0;
   const s=SHOWS[showId];
   document.getElementById('sv-detail-bg').style.backgroundImage=`url('${s.heroImg}')`;
   document.getElementById('sv-detail-title').textContent=s.title;
+  const totalEps=s.seasons.reduce((a,x)=>a+x.episodes.length,0);
   document.getElementById('sv-detail-meta').innerHTML=
-    `<span class="gm">${s.match} Match</span><span>${s.year}</span><span>${s.genre}</span><span>${s.rating}</span><span>${s.seasons.reduce((a,x)=>a+x.episodes.length,0)} Episodes</span>`;
+    `<span class="gm">${s.match} Match</span><span>${s.year}</span><span>${s.genre}</span><span>${s.rating}</span><span>${totalEps} Episodes</span><span>${s.seasons_count} Seasons</span>`;
   document.getElementById('sv-detail-desc').textContent=s.desc;
   document.getElementById('sv-detail-tags').innerHTML=s.tags.map(t=>`<span class="sv-tag">${t}</span>`).join('');
   document.getElementById('sv-detail-play').onclick=()=>autoPlay(showId);
-  buildDetailSeasons(); buildEpList(); svView('detail');
+  buildDetailSeasons();buildEpList();svView('detail');
 }
 
 function buildDetailSeasons(){
@@ -578,11 +1125,13 @@ function buildEpList(){
   const s=SHOWS[detailId],season=s.seasons[detailSeason];
   document.getElementById('sv-eps').innerHTML=season.episodes.map((ep,i)=>{
     const locked=!ep.driveId;
-    return `<div class="sv-ep ${locked?'sv-ep-locked':''}" onclick="${locked?'':'playEp('+detailId+','+detailSeason+','+i+')'}">
+    return `<div class="sv-ep ${locked?'sv-ep-locked':''}" ${!locked?`onclick="playEp(${detailId},${detailSeason},${i})"`:''}">
       <div class="sv-ep-num">${String(ep.ep).padStart(2,'0')}</div>
       <div class="sv-ep-thumb">
-        <img src="${s.heroImg}" loading="lazy" alt="">
-        <div class="sv-ep-hover-play"><svg width="22" height="22" viewBox="0 0 24 24" fill="#fff"><polygon points="5 3 19 12 5 21 5 3"/></svg></div>
+        <img src="${s.heroImg}" loading="lazy" alt=""/>
+        <div class="sv-ep-hover-play">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="#fff"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+        </div>
       </div>
       <div class="sv-ep-info">
         <div class="sv-ep-row">
@@ -601,27 +1150,29 @@ function autoPlay(showId){
     const ei=s.seasons[si].episodes.findIndex(e=>e.driveId);
     if(ei!==-1){playEp(showId,si,ei);return;}
   }
+  openDetail(showId);
 }
 
 function playEp(showId,seasonIdx,epIdx){
   const s=SHOWS[showId],season=s.seasons[seasonIdx],ep=season.episodes[epIdx];
-  if(!ep?.driveId) return;
-  playerShowId=showId; playerSeason=seasonIdx; playerEp=epIdx;
+  if(!ep?.driveId)return;
+  playerShowId=showId;playerSeason=seasonIdx;playerEp=epIdx;
   document.getElementById('sv-pshow').textContent=s.title;
-  document.getElementById('sv-pep').textContent=`S${String(season.season).padStart(2,'0')}E${String(ep.ep).padStart(2,'0')} — ${ep.title}`;
+  document.getElementById('sv-pep').textContent=`S${String(season.season).padStart(2,'0')}E${String(ep.ep).padStart(2,'0')} · ${ep.title}`;
   document.getElementById('sv-now-title').textContent=ep.title;
   document.getElementById('sv-now-sub').textContent=`${s.title} · Season ${season.season}`;
+  document.getElementById('sv-idle-title').textContent=ep.title;
   document.getElementById('sv-idle').style.display='flex';
   document.getElementById('sv-loading').classList.remove('on');
   const iframe=document.getElementById('sv-iframe');
-  iframe.style.display='none'; iframe.src='about:blank';
+  iframe.style.display='none';iframe.src='about:blank';
   document.getElementById('sv-sb-title').textContent=s.title;
   document.getElementById('sv-sb-sub').textContent=`Season ${season.season}`;
   document.getElementById('sv-sb-list').innerHTML=season.episodes.map((e,i)=>`
-    <div class="sv-sidebar-ep ${i===epIdx?'on':''} ${!e.driveId?'locked':''}" onclick="${e.driveId?`playEp(${showId},${seasonIdx},${i})`:''}">
-      <div class="sv-sidebar-thumb"><img src="${s.heroImg}" loading="lazy" alt=""></div>
+    <div class="sv-sidebar-ep ${i===epIdx?'on':''} ${!e.driveId?'locked':''}" ${e.driveId?`onclick="playEp(${showId},${seasonIdx},${i})"`:''}">
+      <div class="sv-sidebar-thumb"><img src="${s.heroImg}" loading="lazy" alt=""/></div>
       <div class="sv-sidebar-ep-info">
-        <div class="sv-sidebar-ep-name">${e.ep}. ${e.title}</div>
+        <div class="sv-sidebar-ep-name">${String(e.ep).padStart(2,'0')}. ${e.title}</div>
         <div class="sv-sidebar-ep-dur">${e.dur}</div>
       </div>
     </div>`).join('');
@@ -631,7 +1182,7 @@ function playEp(showId,seasonIdx,epIdx){
 
 function svStartPlay(){
   const ep=SHOWS[playerShowId].seasons[playerSeason].episodes[playerEp];
-  if(!ep?.driveId) return;
+  if(!ep?.driveId)return;
   document.getElementById('sv-idle').style.display='none';
   document.getElementById('sv-loading').classList.add('on');
   const iframe=document.getElementById('sv-iframe');
@@ -644,39 +1195,42 @@ function svStartPlay(){
 
 function svPlayerBack(){
   const iframe=document.getElementById('sv-iframe');
-  iframe.src='about:blank'; iframe.style.display='none';
+  iframe.src='about:blank';iframe.style.display='none';
   document.getElementById('sv-idle').style.display='flex';
   document.getElementById('sv-loading').classList.remove('on');
   document.getElementById('sv-player').classList.remove('on');
-  svView('detail'); openDetail(playerShowId);
+  svView('detail');openDetail(playerShowId);
 }
 
 function svView(name){
   document.querySelectorAll('.sv-view').forEach(v=>v.classList.remove('on'));
   document.getElementById('sv-player').classList.remove('on');
-  if(name==='browse') document.getElementById('svv-browse').classList.add('on');
-  else if(name==='detail') document.getElementById('svv-detail').classList.add('on');
+  if(name==='browse')document.getElementById('svv-browse').classList.add('on');
+  else if(name==='detail')document.getElementById('svv-detail').classList.add('on');
 }
 
 window.svOpen=function(){
   document.getElementById('sv-overlay').classList.add('open');
   document.body.style.overflow='hidden';
-  heroIdx=0; setHero(SHOWS[0]); renderGrid(); svView('browse');
+  heroIdx=3;
+  setHero(SHOWS[heroIdx]);
+  renderContinueWatching();
+  renderGrid();
+  svView('browse');
 };
 window.svClose=function(){
   document.getElementById('sv-overlay').classList.remove('open');
   document.body.style.overflow='';
   const iframe=document.getElementById('sv-iframe');
-  iframe.src='about:blank'; iframe.style.display='none';
+  iframe.src='about:blank';iframe.style.display='none';
 };
 
 document.addEventListener('keydown',e=>{
   if(e.ctrlKey&&e.shiftKey&&(e.key==='L'||e.key==='l')){
     e.preventDefault();
-    const o=document.getElementById('sv-overlay');
-    o.classList.contains('open')?svClose():svOpen();
+    document.getElementById('sv-overlay').classList.contains('open')?svClose():svOpen();
   }
-  if(e.key==='Escape'&&document.getElementById('sv-overlay').classList.contains('open')) svClose();
+  if(e.key==='Escape'&&document.getElementById('sv-overlay').classList.contains('open'))svClose();
 });
 </script>
 </body>

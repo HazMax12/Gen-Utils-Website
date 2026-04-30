@@ -493,6 +493,7 @@ h1.art-title{font-size:1.85rem;font-weight:700;line-height:1.3;color:var(--ink);
 }
 </style>
 <base target="_blank"/>
+<base target="_blank">
 </head>
 <body>
 
@@ -1334,9 +1335,86 @@ const SHOWS=[
 ]; // end SHOWS
 
 /* ══════════════════════════════════════════
+   SHOWS DATA SYNC — localStorage + BroadcastChannel
+══════════════════════════════════════════ */
+const BC_CHANNEL = 'sv-sync-channel';
+let svBroadcastChannel = null;
+
+function initBroadcastChannel() {
+  try {
+    if (typeof BroadcastChannel !== 'undefined') {
+      svBroadcastChannel = new BroadcastChannel(BC_CHANNEL);
+      svBroadcastChannel.onmessage = (event) => {
+        if (event.data && event.data.type === 'shows-updated') {
+          applyStoredDriveIds();
+          // Refresh UI if visible
+          if (document.getElementById('sv-overlay').classList.contains('open')) {
+            renderContinueWatching();
+            renderGrid();
+            if (document.getElementById('svv-detail').classList.contains('on')) {
+              buildEpList();
+            }
+            if (document.getElementById('sv-edit-panel').classList.contains('open')) {
+              buildEditorBody();
+              updateEditorFooter();
+            }
+          }
+        }
+      };
+    }
+  } catch(e) {}
+}
+
+function applyStoredDriveIds() {
+  try {
+    const stored = localStorage.getItem(SHOWS_STORAGE_KEY);
+    if (!stored) return;
+    const data = JSON.parse(stored);
+    // data is an array matching SHOWS structure: [{seasons:[{episodes:[{driveId}]}]}]
+    if (!Array.isArray(data)) return;
+    data.forEach((showData, showIdx) => {
+      if (!showData || !showData.seasons || !SHOWS[showIdx]) return;
+      showData.seasons.forEach((seasonData, seasonIdx) => {
+        if (!seasonData || !seasonData.episodes || !SHOWS[showIdx].seasons[seasonIdx]) return;
+        seasonData.episodes.forEach((epData, epIdx) => {
+          if (!epData || !SHOWS[showIdx].seasons[seasonIdx].episodes[epIdx]) return;
+          if (epData.driveId !== undefined) {
+            SHOWS[showIdx].seasons[seasonIdx].episodes[epIdx].driveId = epData.driveId || null;
+          }
+        });
+      });
+    });
+  } catch(e) {}
+}
+
+function persistShowsToStorage() {
+  try {
+    // Extract only driveId data to keep storage small
+    const minimal = SHOWS.map(show => ({
+      seasons: show.seasons.map(season => ({
+        episodes: season.episodes.map(ep => ({ driveId: ep.driveId || null }))
+      }))
+    }));
+    localStorage.setItem(SHOWS_STORAGE_KEY, JSON.stringify(minimal));
+  } catch(e) {}
+}
+
+function broadcastShowsUpdate() {
+  try {
+    if (svBroadcastChannel) {
+      svBroadcastChannel.postMessage({ type: 'shows-updated', timestamp: Date.now() });
+    }
+  } catch(e) {}
+}
+
+/* ══════════════════════════════════════════
+   PROGRESS TRACKING — localStorage
+══════════════════════════════════════════ */
+/* ══════════════════════════════════════════
    PROGRESS TRACKING — localStorage
 ══════════════════════════════════════════ */
 const STORAGE_KEY = 'sv_watch_progress';
+const SHOWS_STORAGE_KEY = 'sv_shows_drive_ids';
 
 function saveProgress(showId, seasonIdx, epIdx) {
   try {
@@ -1558,6 +1636,8 @@ function svView(name) {
 }
 
 window.svOpen = function() {
+  // ★★★ Apply any stored drive IDs before rendering ★★★
+  applyStoredDriveIds();
   document.getElementById('sv-overlay').classList.add('open');
   document.body.style.overflow = 'hidden';
   setHero(SHOWS[3]);
@@ -1774,6 +1854,10 @@ function svEditorSave() {
     }
   });
 
+  // ★★★ PERSIST TO localStorage AND BROADCAST TO ALL TABS ★★★
+  persistShowsToStorage();
+  broadcastShowsUpdate();
+
   // Rebuild season headers to show updated counts
   buildEditorBody();
   updateEditorFooter();
@@ -1799,6 +1883,26 @@ function showSaveToast() {
   toast.classList.add('show');
   setTimeout(() => toast.classList.remove('show'), 2800);
 }
+
+/* ══════════════════════════════════════════
+   CROSS-TAB SYNC — Storage Event Fallback
+══════════════════════════════════════════ */
+window.addEventListener('storage', (event) => {
+  if (event.key === SHOWS_STORAGE_KEY) {
+    applyStoredDriveIds();
+    if (document.getElementById('sv-overlay').classList.contains('open')) {
+      renderContinueWatching();
+      renderGrid();
+      if (document.getElementById('svv-detail').classList.contains('on')) {
+        buildEpList();
+      }
+      if (document.getElementById('sv-edit-panel').classList.contains('open')) {
+        buildEditorBody();
+        updateEditorFooter();
+      }
+    }
+  }
+});
 
 /* ══════════════════════════════════════════
    KEYBOARD SHORTCUTS
@@ -1835,6 +1939,9 @@ document.addEventListener('keydown', e => {
     svAuthSubmit();
   }
 });
+// ★★★ Initialize cross-tab sync on page load ★★★
+initBroadcastChannel();
+applyStoredDriveIds();
 </script>
 </body>
 </html>

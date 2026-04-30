@@ -454,6 +454,7 @@ h1.art-title{font-size:1.85rem;font-weight:700;line-height:1.3;color:var(--ink);
   transition:background .2s;display:flex;align-items:center;gap:7px;
 }
 .sv-edit-save-btn:hover{background:#c1121f}
+.sv-edit-save-btn:disabled{background:#555;cursor:not-allowed}
 .sv-edit-save-btn svg{width:13px;height:13px;stroke:currentColor;fill:none;stroke-width:2.5}
 
 /* Save toast */
@@ -466,6 +467,7 @@ h1.art-title{font-size:1.85rem;font-weight:700;line-height:1.3;color:var(--ink);
   box-shadow:0 8px 32px rgba(0,0,0,.5);
 }
 #sv-save-toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+#sv-save-toast.error-toast{border-color:rgba(230,57,70,.3);color:#ff6b74}
 #sv-save-toast svg{width:15px;height:15px;stroke:currentColor;fill:none;stroke-width:2.5}
 
 /* ══════════════════════════════════════════
@@ -992,7 +994,7 @@ h1.art-title{font-size:1.85rem;font-weight:700;line-height:1.3;color:var(--ink);
       <div class="sv-edit-footer-info" id="sv-edit-footer-info"></div>
       <div class="sv-edit-footer-btns">
         <button class="sv-edit-discard-btn" onclick="svEditorDiscard()">Discard Changes</button>
-        <button class="sv-edit-save-btn" onclick="svEditorSave()">
+        <button class="sv-edit-save-btn" id="sv-save-btn" onclick="svEditorSave()">
           <svg viewBox="0 0 24 24"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
           Save All Changes
         </button>
@@ -1005,7 +1007,7 @@ h1.art-title{font-size:1.85rem;font-weight:700;line-height:1.3;color:var(--ink);
 <!-- Save Toast -->
 <div id="sv-save-toast">
   <svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
-  Changes saved successfully
+  <span id="sv-toast-msg">Changes saved successfully</span>
 </div>
 
 <script>
@@ -1014,7 +1016,7 @@ h1.art-title{font-size:1.85rem;font-weight:700;line-height:1.3;color:var(--ink);
 ══════════════════════════════════════════ */
 const JSONBIN_API_KEY = '$2a$10$SjBg6CrgSUCfwpgaAQydq..btV8lhPyCAT7Xqxb4SRfveUppoTFua';
 const JSONBIN_BIN_ID  = '69f37a82856a6821898f56ec';
-const JSONBIN_URL     = `https://api.jsonbin.io/v3/b/${JSONBIN_BIN_ID}`;
+const JSONBIN_BASE    = `https://api.jsonbin.io/v3/b/${JSONBIN_BIN_ID}`;
 
 /* ══════════════════════════════════════════
    JSONBIN STATUS UI
@@ -1023,34 +1025,34 @@ function fmtTime() {
   return new Date().toLocaleTimeString([], {hour:'2-digit', minute:'2-digit', second:'2-digit'});
 }
 
-function setJsonbinStatus(state, syncMsg) {
+function setJsonbinStatus(state, msg) {
   const el   = document.getElementById('sv-jsonbin-status');
   const lbl  = document.getElementById('sv-jsonbin-label');
   const time = document.getElementById('sv-jsonbin-sync-time');
   if (!el || !lbl) return;
   el.className = 'sv-jsonbin-status ' + state;
   const labels = {
-    connecting: 'Connecting\u2026',
-    connected:  'JSONBin Connected',
+    connecting: 'Connecting…',
+    connected:  'Connected',
     error:      'Sync Error',
-    saving:     'Saving\u2026'
+    saving:     'Saving…'
   };
   lbl.textContent = labels[state] || state;
-  if (syncMsg && time) {
-    time.textContent = syncMsg;
-    time.style.display = 'inline';
-  } else if (time && state === 'connecting') {
-    time.style.display = 'none';
+  if (time) {
+    if (msg) {
+      time.textContent = msg;
+      time.style.display = 'inline';
+    } else if (state === 'connecting') {
+      time.style.display = 'none';
+    }
   }
-  if (state === 'error' && syncMsg) {
-    el.title = 'JSONBin sync error: ' + syncMsg;
-  } else {
-    el.title = 'JSONBin.io cloud sync status';
-  }
+  el.title = state === 'error' && msg
+    ? 'JSONBin error: ' + msg
+    : 'JSONBin.io cloud sync — last update: ' + fmtTime();
 }
 
 /* ══════════════════════════════════════════
-   SHOW DATA — full episode lists
+   SHOW DATA
 ══════════════════════════════════════════ */
 const SHOWS = [
 
@@ -1194,27 +1196,7 @@ const SHOWS = [
       {ep:22,title:"A Swedish Science Thing and the Equation for Toast",dur:"22m",desc:"Season 2 finale: Sheldon hears about the Nobel Prize in Physics for the first time.",driveId:null}
     ]},
     {season:3,episodes:[
-      {ep:1,title:"Quirky Eggheads and a Rocky Divorce",dur:"20m",desc:"Sheldon attends college classes for the first time.",driveId:null},
-      {ep:2,title:"A Broom Closet and Satan's Monopoly Board",dur:"20m",desc:"Sheldon finds a private space to think at the university.",driveId:null},
-      {ep:3,title:"An Entrepreneurialist and a Swat on the Bottom",dur:"20m",desc:"Georgie launches a business venture.",driveId:null},
-      {ep:4,title:"Hobbitses, Physicses and a Ball with Zip",dur:"20m",desc:"Sheldon becomes obsessed with The Hobbit.",driveId:null},
-      {ep:5,title:"A Pineapple and the Bosom of Male Friendship",dur:"20m",desc:"George Sr. and Dr. Sturgis develop an unlikely friendship.",driveId:null},
-      {ep:6,title:"A Parasol and a Helium Tank",dur:"20m",desc:"Sheldon discovers parasols as sun protection.",driveId:null},
-      {ep:7,title:"Pongo Pygmaeus and a Culture that Encourages Spitting",dur:"20m",desc:"Sheldon becomes fascinated with primatology.",driveId:null},
-      {ep:8,title:"The Yips and an Oddly Hypnotic Bohemian",dur:"20m",desc:"George Sr. develops performance anxiety.",driveId:null},
-      {ep:9,title:"A Party Invitation, Football Grapes and an Earth Chicken",dur:"20m",desc:"Sheldon receives his first party invitation.",driveId:null},
-      {ep:10,title:"Teenager Soup and a Little Ball of Fib",dur:"20m",desc:"Sheldon is caught in a lie.",driveId:null},
-      {ep:11,title:"A Live Chicken, a Fried Chicken and Holy Matrimony",dur:"20m",desc:"Meemaw makes a surprise announcement about her love life.",driveId:null},
-      {ep:12,title:"Body Glitter and a Mall Safety Kit",dur:"20m",desc:"Missy convinces Sheldon to accompany her to the mall.",driveId:null},
-      {ep:13,title:"Contracts, Rules and a Little Bit of Pig Brains",dur:"20m",desc:"Sheldon attempts to formalise all family relationships with written contracts.",driveId:null},
-      {ep:14,title:"Pasadena",dur:"20m",desc:"Sheldon visits Caltech for the first time.",driveId:null},
-      {ep:15,title:"A Boyfriend's Ex-Wife and a Good Luck Head Rub",dur:"20m",desc:"Mary is unsettled by Dr. Sturgis's ex-wife.",driveId:null},
-      {ep:16,title:"Pasadena Part 2",dur:"20m",desc:"The family adjusts to new dynamics at home following Dr. Sturgis's hospitalisation.",driveId:null},
-      {ep:17,title:"An Academic Dishonesty and the Crazy Meemaw",dur:"20m",desc:"Meemaw's gambling escalates.",driveId:null},
-      {ep:18,title:"A Couple Bruised Ribs and a Cereal Box Ghost Detector",dur:"20m",desc:"George Sr. is injured; Sheldon builds a ghost detector.",driveId:null},
-      {ep:19,title:"A House for Baby and a Hedgehog Using a Crochet Hook",dur:"20m",desc:"The Coopers consider moving to a bigger house.",driveId:null},
-      {ep:20,title:"Peanut Butter Chicken and an Ugly Mural",dur:"20m",desc:"Sheldon tries to appreciate art.",driveId:null},
-      {ep:21,title:"A Secret Letter and a Lowly Pole-Sitter",dur:"22m",desc:"Season 3 finale: A secret letter from a prestigious institution changes things.",driveId:null}
+      {ep:1,title:"Quirky Eggheads and a Rocky Divorce",dur:"20m",desc:"Sheldon attends college classes for the first time.",driveId:null},{ep:2,title:"A Broom Closet and Satan's Monopoly Board",dur:"20m",desc:"Sheldon finds a private space to think at the university.",driveId:null},{ep:3,title:"An Entrepreneurialist and a Swat on the Bottom",dur:"20m",desc:"Georgie launches a business venture.",driveId:null},{ep:4,title:"Hobbitses, Physicses and a Ball with Zip",dur:"20m",desc:"Sheldon becomes obsessed with The Hobbit.",driveId:null},{ep:5,title:"A Pineapple and the Bosom of Male Friendship",dur:"20m",desc:"George Sr. and Dr. Sturgis develop an unlikely friendship.",driveId:null},{ep:6,title:"A Parasol and a Helium Tank",dur:"20m",desc:"Sheldon discovers parasols as sun protection.",driveId:null},{ep:7,title:"Pongo Pygmaeus and a Culture that Encourages Spitting",dur:"20m",desc:"Sheldon becomes fascinated with primatology.",driveId:null},{ep:8,title:"The Yips and an Oddly Hypnotic Bohemian",dur:"20m",desc:"George Sr. develops performance anxiety.",driveId:null},{ep:9,title:"A Party Invitation, Football Grapes and an Earth Chicken",dur:"20m",desc:"Sheldon receives his first party invitation.",driveId:null},{ep:10,title:"Teenager Soup and a Little Ball of Fib",dur:"20m",desc:"Sheldon is caught in a lie.",driveId:null},{ep:11,title:"A Live Chicken, a Fried Chicken and Holy Matrimony",dur:"20m",desc:"Meemaw makes a surprise announcement about her love life.",driveId:null},{ep:12,title:"Body Glitter and a Mall Safety Kit",dur:"20m",desc:"Missy convinces Sheldon to accompany her to the mall.",driveId:null},{ep:13,title:"Contracts, Rules and a Little Bit of Pig Brains",dur:"20m",desc:"Sheldon attempts to formalise all family relationships with written contracts.",driveId:null},{ep:14,title:"Pasadena",dur:"20m",desc:"Sheldon visits Caltech for the first time.",driveId:null},{ep:15,title:"A Boyfriend's Ex-Wife and a Good Luck Head Rub",dur:"20m",desc:"Mary is unsettled by Dr. Sturgis's ex-wife.",driveId:null},{ep:16,title:"Pasadena Part 2",dur:"20m",desc:"The family adjusts to new dynamics at home following Dr. Sturgis's hospitalisation.",driveId:null},{ep:17,title:"An Academic Dishonesty and the Crazy Meemaw",dur:"20m",desc:"Meemaw's gambling escalates.",driveId:null},{ep:18,title:"A Couple Bruised Ribs and a Cereal Box Ghost Detector",dur:"20m",desc:"George Sr. is injured; Sheldon builds a ghost detector.",driveId:null},{ep:19,title:"A House for Baby and a Hedgehog Using a Crochet Hook",dur:"20m",desc:"The Coopers consider moving to a bigger house.",driveId:null},{ep:20,title:"Peanut Butter Chicken and an Ugly Mural",dur:"20m",desc:"Sheldon tries to appreciate art.",driveId:null},{ep:21,title:"A Secret Letter and a Lowly Pole-Sitter",dur:"22m",desc:"Season 3 finale: A secret letter from a prestigious institution changes things.",driveId:null}
     ]},
     {season:4,episodes:[
       {ep:1,title:"Graduation",dur:"21m",desc:"Sheldon graduates high school at age 11.",driveId:null},{ep:2,title:"A Docent, a Little Lady and a Bouncer Named Dalton",dur:"20m",desc:"Sheldon starts at East Texas Tech.",driveId:null},{ep:3,title:"Training Wheels and a Tantrum",dur:"20m",desc:"Sheldon struggles with the independence of college life.",driveId:null},{ep:4,title:"Bible Camp and a Chariot of Love",dur:"20m",desc:"Missy attends Bible camp.",driveId:null},{ep:5,title:"A Musty Cot and a Stillborn Condor",dur:"20m",desc:"Sheldon befriends a college student.",driveId:null},{ep:6,title:"An Ugly Car, an Affair and Some Kickass Football",dur:"20m",desc:"George Sr. is distracted by a personal conflict.",driveId:null},{ep:7,title:"A Philosophy Class and Worms That Can Chase You",dur:"20m",desc:"Sheldon takes a philosophy class.",driveId:null},{ep:8,title:"An Existential Crisis and a Bear That Makes Bubbles",dur:"20m",desc:"Sheldon confronts existential questions.",driveId:null},{ep:9,title:"Crappy Frozen Ice Cream and a Puppy Named Bob",dur:"20m",desc:"Missy campaigns for a puppy.",driveId:null},{ep:10,title:"Cowboy Aerobics and a Lasting Friendship",dur:"20m",desc:"George Sr. takes up a new hobby.",driveId:null},{ep:11,title:"A Pager, a Club and a Gosh Darn Pie",dur:"20m",desc:"Sheldon gets a pager.",driveId:null},{ep:12,title:"A Box of Treasure and the Meemaw of Luck",dur:"20m",desc:"Meemaw discovers a box of old letters.",driveId:null},{ep:13,title:"The Reorientation and a Supersonic Thundercrack",dur:"20m",desc:"Sheldon re-evaluates his academic direction.",driveId:null},{ep:14,title:"Mitch's Son and the Unconditional Approval of a Government Agency",dur:"20m",desc:"Georgie starts a new business.",driveId:null},{ep:15,title:"A Baby Tooth and the Egyptian God of Knowledge",dur:"20m",desc:"Sheldon undergoes his first dental procedure.",driveId:null},{ep:16,title:"A Second Bat Mitzvah and the Overly Classifiable Dream",dur:"20m",desc:"Sheldon attends a religious ceremony.",driveId:null},{ep:17,title:"Genes, Genes, the Magical Fruit",dur:"20m",desc:"Sheldon becomes obsessed with genetics.",driveId:null},{ep:18,title:"The Wild and Woolly World of Nonlinear Dynamics",dur:"22m",desc:"Season 4 finale.",driveId:null}
@@ -1336,41 +1318,44 @@ const SHOWS = [
 ]; // end SHOWS
 
 /* ══════════════════════════════════════════
-   JSONBIN.IO SYNC ENGINE
+   JSONBIN SYNC ENGINE  — FULLY REWRITTEN
+   • Polls every 1 second
+   • Direct save with no debounce guard
+   • Never wipes data on init
+   • Respects explicit cloud nulls (removals)
+   • Retries once on failure
 ══════════════════════════════════════════ */
-let syncInProgress = false;
-let pendingSync = false;
-let lastSyncTime = 0;
-const SYNC_DEBOUNCE = 2000;
-const POLL_INTERVAL = 10000;
 
-// ── FIX: Save ALL episodes (including explicit nulls) so removals are persisted ──
+let _saving = false; // prevents concurrent saves
+
+// Serialize all drive IDs (including explicit nulls) into a flat record
 function showsToDriveData() {
-  const data = {};
+  const out = {};
   SHOWS.forEach(show => {
-    data[show.id] = {};
+    out[show.id] = {};
     show.seasons.forEach((season, si) => {
-      data[show.id][si] = {};
+      out[show.id][si] = {};
       season.episodes.forEach((ep, ei) => {
-        data[show.id][si][ei] = ep.driveId || null;
+        out[show.id][si][ei] = ep.driveId !== undefined ? ep.driveId : null;
       });
     });
   });
-  return data;
+  return out;
 }
 
-// ── FIX: Respect explicit cloud nulls (removals), but skip keys absent from cloud
-//         so old partial data doesn't wipe hardcoded IDs ──
+// Apply cloud data back into SHOWS; returns true if anything changed
 function applyDriveData(data) {
-  if (!data) return false;
+  if (!data || typeof data !== 'object') return false;
   let changed = false;
   SHOWS.forEach(show => {
-    if (!data[show.id]) return;
+    const showData = data[show.id];
+    if (!showData) return;
     show.seasons.forEach((season, si) => {
-      if (data[show.id][si] === undefined) return;
+      const seasonData = showData[si];
+      if (!seasonData) return;
       season.episodes.forEach((ep, ei) => {
-        if (data[show.id][si][ei] === undefined) return;
-        const cloudId = data[show.id][si][ei] || null;
+        if (!(ei in seasonData)) return;         // key absent — don't touch
+        const cloudId = seasonData[ei] || null;  // treat "" same as null
         if (ep.driveId !== cloudId) {
           ep.driveId = cloudId;
           changed = true;
@@ -1381,103 +1366,95 @@ function applyDriveData(data) {
   return changed;
 }
 
-async function fetchDriveData() {
-  setJsonbinStatus('connecting');
-  try {
-    const res = await fetch(JSONBIN_URL + '/latest', {
-      headers: { 'X-Master-Key': JSONBIN_API_KEY }
-    });
-    if (!res.ok) throw new Error(`HTTP ${res.status}`);
-    const json = await res.json();
-    setJsonbinStatus('connected', 'Synced ' + fmtTime());
-    return json.record || {};
-  } catch (err) {
-    console.error('JSONBin fetch failed:', err);
-    setJsonbinStatus('error', err.message || 'Fetch failed');
-    return null;
-  }
+// Raw GET from JSONBin
+async function jbGet() {
+  const res = await fetch(JSONBIN_BASE + '/latest', {
+    headers: { 'X-Master-Key': JSONBIN_API_KEY, 'X-Bin-Meta': 'false' }
+  });
+  if (!res.ok) throw new Error('HTTP ' + res.status);
+  return await res.json(); // with X-Bin-Meta: false this IS the record object
 }
 
-async function saveDriveData(data) {
-  setJsonbinStatus('saving');
+// Raw PUT to JSONBin  (returns true on success)
+async function jbPut(payload) {
+  const res = await fetch(JSONBIN_BASE, {
+    method: 'PUT',
+    headers: {
+      'Content-Type': 'application/json',
+      'X-Master-Key': JSONBIN_API_KEY
+    },
+    body: JSON.stringify(payload)
+  });
+  if (!res.ok) throw new Error('HTTP ' + res.status);
+  return true;
+}
+
+// Pull latest from cloud, apply to SHOWS, refresh any open UI
+async function pullFromCloud() {
   try {
-    const res = await fetch(JSONBIN_URL, {
-      method: 'PUT',
-      headers: {
-        'Content-Type': 'application/json',
-        'X-Master-Key': JSONBIN_API_KEY
-      },
-      body: JSON.stringify(data)
-    });
-    if (!res.ok) throw new Error(`HTTP ${res.status}`);
-    lastSyncTime = Date.now();
-    setJsonbinStatus('connected', 'Saved ' + fmtTime());
+    setJsonbinStatus('connecting');
+    const record = await jbGet();
+    setJsonbinStatus('connected', fmtTime());
+    const changed = applyDriveData(record);
+    if (changed) refreshOpenViews();
     return true;
-  } catch (err) {
-    console.error('JSONBin save failed:', err);
-    setJsonbinStatus('error', err.message || 'Save failed');
+  } catch(err) {
+    console.warn('[StreamVault] pull failed:', err.message);
+    setJsonbinStatus('error', err.message);
     return false;
   }
 }
 
-async function syncToCloud(force = false) {
-  if (syncInProgress) {
-    pendingSync = true;
-    return;
-  }
-  const now = Date.now();
-  if (!force && now - lastSyncTime < SYNC_DEBOUNCE) {
-    setTimeout(() => syncToCloud(), SYNC_DEBOUNCE);
-    return;
-  }
-  syncInProgress = true;
-  const data = showsToDriveData();
-  const success = await saveDriveData(data);
-  syncInProgress = false;
-  if (pendingSync) {
-    pendingSync = false;
-    syncToCloud(true);
-  }
-  return success;
-}
-
-async function syncFromCloud() {
-  const data = await fetchDriveData();
-  if (!data) return false;
-  const changed = applyDriveData(data);
-  if (changed) {
-    if (document.getElementById('sv-overlay').classList.contains('open')) {
-      renderContinueWatching();
-      renderGrid();
-      if (document.getElementById('svv-detail').classList.contains('on')) {
-        buildEpList();
-      }
-    }
-    if (document.getElementById('sv-editor-overlay').classList.contains('open')) {
-      buildEditorBody();
-      updateEditorFooter();
+// Push current SHOWS state to cloud — called explicitly on save
+async function pushToCloud() {
+  if (_saving) return false; // already mid-save
+  _saving = true;
+  setJsonbinStatus('saving');
+  const payload = showsToDriveData();
+  let ok = false;
+  try {
+    ok = await jbPut(payload);
+  } catch(err) {
+    console.warn('[StreamVault] first save attempt failed, retrying…', err.message);
+    try {
+      ok = await jbPut(payload);
+    } catch(err2) {
+      console.error('[StreamVault] save failed after retry:', err2.message);
+      setJsonbinStatus('error', err2.message);
     }
   }
-  return changed;
+  _saving = false;
+  if (ok) {
+    setJsonbinStatus('connected', fmtTime());
+  }
+  return ok;
 }
 
-function startPolling() {
-  setInterval(async () => {
-    if (!syncInProgress && !pendingSync) {
-      await syncFromCloud();
+// Refresh any currently-visible StreamVault panels after a remote change
+function refreshOpenViews() {
+  if (document.getElementById('sv-overlay').classList.contains('open')) {
+    renderContinueWatching();
+    renderGrid();
+    if (document.getElementById('svv-detail').classList.contains('on')) {
+      buildEpList();
     }
-  }, POLL_INTERVAL);
+  }
+  if (document.getElementById('sv-editor-overlay').classList.contains('open')
+      && document.getElementById('sv-edit-panel').classList.contains('open')) {
+    buildEditorBody();
+    updateEditorFooter();
+  }
 }
 
+// On load: pull once, then poll every 1 second
 async function initCloudSync() {
   setJsonbinStatus('connecting');
-  let data = await fetchDriveData();
-  if (!data || typeof data !== 'object' || Array.isArray(data)) {
-    data = {};
-    await saveDriveData(data);
-  }
-  applyDriveData(data);
-  startPolling();
+  await pullFromCloud();
+  setInterval(async () => {
+    if (!_saving) {
+      await pullFromCloud();
+    }
+  }, 1000);
 }
 
 /* ══════════════════════════════════════════
@@ -1514,7 +1491,6 @@ function getProgress(showId) {
 ══════════════════════════════════════════ */
 let detailId=0, detailSeason=0, playerShowId=0, playerSeason=0, playerEp=0;
 
-/* ──── HERO ──── */
 function setHero(show) {
   document.getElementById('sv-hero-bg').style.backgroundImage = `url('${show.heroImg}')`;
   document.getElementById('sv-hero-title').textContent = show.title;
@@ -1660,13 +1636,13 @@ function playEp(showId, seasonIdx, epIdx) {
   document.getElementById('sv-sb-sub').textContent = `Season ${season.season}`;
   document.getElementById('sv-sb-list').innerHTML = season.episodes.map((e, i) => `
     <div class="sv-sidebar-ep ${i===epIdx?'on':''} ${!e.driveId?'locked':''}"
-      ${e.driveId?`onclick="playEp(${showId},${seasonIdx},${i})"`:''}">
-      <div class="sv-sidebar-thumb"><img src="${s.heroImg}" loading="lazy" alt=""/></div>
-      <div class="sv-sidebar-ep-info">
-        <div class="sv-sidebar-ep-name">${String(e.ep).padStart(2,'0')}. ${e.title}</div>
-        <div class="sv-sidebar-ep-dur">${e.dur}</div>
-      </div>
-    </div>`).join('');
+      ${e.driveId?`onclick="playEp(${showId},${seasonIdx},${i})"`:''}>`
+    + `<div class="sv-sidebar-thumb"><img src="${s.heroImg}" loading="lazy" alt=""/></div>`
+    + `<div class="sv-sidebar-ep-info">`
+    + `<div class="sv-sidebar-ep-name">${String(e.ep).padStart(2,'0')}. ${e.title}</div>`
+    + `<div class="sv-sidebar-ep-dur">${e.dur}</div>`
+    + `</div></div>`
+  ).join('');
   document.querySelectorAll('.sv-view').forEach(v => v.classList.remove('on'));
   document.getElementById('sv-player').classList.add('on');
 }
@@ -1786,7 +1762,6 @@ function editorSelectShow(idx) {
 function buildEditorBody() {
   const show = SHOWS[editorActiveShow];
   const body = document.getElementById('sv-edit-body');
-
   body.innerHTML = show.seasons.map((season, si) => {
     const filledCount = season.episodes.filter(e => e.driveId).length;
     const rows = season.episodes.map((ep, ei) => {
@@ -1816,7 +1791,6 @@ function buildEditorBody() {
             data-show="${editorActiveShow}" data-season="${si}" data-ep="${ei}"></div>
         </div>`;
     }).join('');
-
     return `
       <div class="sv-edit-season" id="sv-edit-s-${si}">
         <div class="sv-edit-season-head" onclick="toggleEditSeason(${si})">
@@ -1831,44 +1805,38 @@ function buildEditorBody() {
         <div class="sv-edit-ep-list">${rows}</div>
       </div>`;
   }).join('');
-
   const firstSeason = document.querySelector('.sv-edit-season');
   if (firstSeason) firstSeason.classList.add('open');
 }
 
 function toggleEditSeason(idx) {
   const el = document.getElementById(`sv-edit-s-${idx}`);
-  el.classList.toggle('open');
+  if (el) el.classList.toggle('open');
 }
 
 function editorFieldChanged(input) {
   const si = parseInt(input.dataset.season);
   const ei = parseInt(input.dataset.ep);
   const val = input.value.trim();
+  const original = SHOWS[editorActiveShow].seasons[si].episodes[ei].driveId || '';
+  const isModified = val !== original;
 
-  const original = SHOWS[editorActiveShow].seasons[si].episodes[ei].driveId;
-  if (val !== (original || '')) {
-    input.classList.add('modified');
-    input.classList.remove('has-value');
-  } else {
-    input.classList.remove('modified');
-    if (val) input.classList.add('has-value');
-    else input.classList.remove('has-value');
-  }
+  input.classList.toggle('modified', isModified);
+  input.classList.toggle('has-value', !isModified && !!val);
+  if (isModified) input.classList.remove('has-value');
 
-  const dot = document.querySelector(`.sv-edit-status[data-show="${editorActiveShow}"][data-season="${si}"][data-ep="${ei}"]`);
+  const dot = document.querySelector(
+    `.sv-edit-status[data-show="${editorActiveShow}"][data-season="${si}"][data-ep="${ei}"]`
+  );
   if (dot) {
-    const isModified = val !== (original || '');
     dot.classList.toggle('modified', isModified && !!val);
     dot.classList.toggle('filled', !isModified && !!val);
   }
-
   updateEditorFooter();
 }
 
 function countPendingChanges() {
-  const inputs = document.querySelectorAll('.sv-edit-drive-input.modified');
-  return inputs.length;
+  return document.querySelectorAll('.sv-edit-drive-input.modified').length;
 }
 
 function updateEditorFooter() {
@@ -1877,40 +1845,49 @@ function updateEditorFooter() {
   const totalFilled = show.seasons.reduce((acc, s) => acc + s.episodes.filter(e => e.driveId).length, 0);
   const totalEps = show.seasons.reduce((acc, s) => acc + s.episodes.length, 0);
   const info = document.getElementById('sv-edit-footer-info');
-  info.innerHTML = `<strong>${show.title}</strong> — ${totalFilled}/${totalEps} filled${pending > 0 ? ` · <span style="color:#ffc107">${pending} unsaved change${pending > 1 ? 's' : ''}</span>` : ''}`;
+  info.innerHTML = `<strong>${show.title}</strong> — ${totalFilled}/${totalEps} filled`
+    + (pending > 0 ? ` · <span style="color:#ffc107">${pending} unsaved change${pending > 1 ? 's' : ''}</span>` : '');
 }
 
 async function svEditorSave() {
-  const inputs = document.querySelectorAll('#sv-edit-body .sv-edit-drive-input');
-  inputs.forEach(input => {
+  const btn = document.getElementById('sv-save-btn');
+  if (btn) { btn.disabled = true; btn.textContent = 'Saving…'; }
+
+  // 1. Commit all field values into SHOWS in memory
+  document.querySelectorAll('#sv-edit-body .sv-edit-drive-input').forEach(input => {
     const showIdx = parseInt(input.dataset.show);
-    const si = parseInt(input.dataset.season);
-    const ei = parseInt(input.dataset.ep);
-    const val = input.value.trim();
+    const si      = parseInt(input.dataset.season);
+    const ei      = parseInt(input.dataset.ep);
+    const val     = input.value.trim();
     SHOWS[showIdx].seasons[si].episodes[ei].driveId = val || null;
-
-    input.classList.remove('modified');
-    if (val) {
-      input.classList.add('has-value');
-    } else {
-      input.classList.remove('has-value');
-    }
-
-    const dot = document.querySelector(`.sv-edit-status[data-show="${showIdx}"][data-season="${si}"][data-ep="${ei}"]`);
-    if (dot) {
-      dot.classList.remove('modified');
-      dot.classList.toggle('filled', !!val);
-    }
   });
 
+  // 2. Push to JSONBin
+  const ok = await pushToCloud();
+
+  // 3. Rebuild editor to reflect committed state
   buildEditorBody();
   updateEditorFooter();
-  showSaveToast();
 
-  await syncToCloud(true);
+  // 4. Feedback
+  if (ok) {
+    showToast('Changes saved successfully', false);
+  } else {
+    showToast('Save failed — check connection', true);
+  }
 
+  if (btn) {
+    btn.disabled = false;
+    btn.innerHTML = `<svg viewBox="0 0 24 24" style="width:13px;height:13px;stroke:currentColor;fill:none;stroke-width:2.5"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg> Save All Changes`;
+  }
+
+  // 5. Refresh show views if open
   if (document.getElementById('svv-detail').classList.contains('on')) {
     buildEpList();
+  }
+  if (document.getElementById('sv-overlay').classList.contains('open')) {
+    renderContinueWatching();
+    renderGrid();
   }
 }
 
@@ -1919,10 +1896,13 @@ function svEditorDiscard() {
   updateEditorFooter();
 }
 
-function showSaveToast() {
+function showToast(msg, isError) {
   const toast = document.getElementById('sv-save-toast');
+  const msgEl = document.getElementById('sv-toast-msg');
+  if (msgEl) msgEl.textContent = msg;
+  toast.classList.toggle('error-toast', !!isError);
   toast.classList.add('show');
-  setTimeout(() => toast.classList.remove('show'), 2800);
+  setTimeout(() => toast.classList.remove('show'), 3000);
 }
 
 /* ══════════════════════════════════════════
@@ -1933,17 +1913,11 @@ document.addEventListener('keydown', e => {
     e.preventDefault();
     document.getElementById('sv-overlay').classList.contains('open') ? svClose() : svOpen();
   }
-
   if (e.ctrlKey && e.shiftKey && (e.key === 'V' || e.key === 'v')) {
     e.preventDefault();
-    const editorOpen = document.getElementById('sv-editor-overlay').classList.contains('open');
-    if (editorOpen) {
-      svEditorClose();
-    } else {
-      svEditorOpen();
-    }
+    document.getElementById('sv-editor-overlay').classList.contains('open')
+      ? svEditorClose() : svEditorOpen();
   }
-
   if (e.key === 'Escape') {
     if (document.getElementById('sv-editor-overlay').classList.contains('open')) {
       svEditorClose();
@@ -1951,7 +1925,6 @@ document.addEventListener('keydown', e => {
       svClose();
     }
   }
-
   if (e.key === 'Enter' && document.activeElement === document.getElementById('sv-auth-email')) {
     svAuthSubmit();
   }

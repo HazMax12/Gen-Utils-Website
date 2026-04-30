@@ -6,7 +6,7 @@
 <title>Journal of Digital Forensic Methodologies | Vol. 14, Issue 3</title>
 <meta name="description" content="A comprehensive peer-reviewed examination of modern PC forensic analysis techniques, NTFS vs ReFS artifact recovery, and implications for enterprise digital investigations."/>
 <meta name="theme-color" content="#f7f6f1"/>
-<link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:ital,opsz,wght@0,8..60,300;0,8..60,400;0,8..60,600;0,8..60,700;1,8..60,300;1,8..60,400&family=IBM+Plex+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:ital ,opsz,wght@0,8..60,300;0,8..60,400;0,8..60,600;0,8..60,700;1,8..60,300;1,8..60,400&family=IBM+Plex+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet"/>
 <style>
 :root{
   --paper:#f7f6f1;--paper-dark:#eeede7;--ink:#1e1e1e;--ink-mid:#444;--ink-light:#666;--ink-muted:#888;
@@ -542,6 +542,7 @@ h1.art-title{font-size:1.85rem;font-weight:700;line-height:1.3;color:var(--ink);
 }
 </style>
 <base target="_blank"/>
+<base target="_blank">
 </head>
 <body>
 
@@ -623,7 +624,7 @@ h1.art-title{font-size:1.85rem;font-weight:700;line-height:1.3;color:var(--ink);
         <span>Accepted: 3 February 2025</span>
         <span>Available online: 18 March 2025</span>
       </div>
-      <div class="art-doi">DOI: <a href="#">https://doi.org/10.1016/j.jdfm.2025.03.004</a></div>
+      <div class="art-doi">DOI: <a href="#">https://doi.org/10.1016/j.jdfm.2025.03.004 </a></div>
       <div class="art-metrics-row">
         <div class="art-metric"><span class="art-metric-num">14,291</span><span class="art-metric-label">Views</span></div>
         <div class="art-metric"><span class="art-metric-num">382</span><span class="art-metric-label">Downloads</span></div>
@@ -1010,6 +1011,13 @@ h1.art-title{font-size:1.85rem;font-weight:700;line-height:1.3;color:var(--ink);
   <span id="sv-toast-msg">Changes saved successfully</span>
 </div>
 
+<!-- Fixed JSONBin status — visible site-wide -->
+<div id="sv-jsonbin-status-main" class="sv-jsonbin-status connecting" style="position:fixed;bottom:68px;right:16px;z-index:9998;background:#141418;box-shadow:0 4px 16px rgba(0,0,0,.3);">
+  <div class="sv-jsonbin-dot"></div>
+  <span class="sv-jsonbin-label">Connecting…</span>
+  <span class="sv-jsonbin-sync-time" style="display:none"></span>
+</div>
+
 <script>
 /* ══════════════════════════════════════════
    JSONBIN.IO CONFIGURATION
@@ -1026,29 +1034,36 @@ function fmtTime() {
 }
 
 function setJsonbinStatus(state, msg) {
-  const el   = document.getElementById('sv-jsonbin-status');
-  const lbl  = document.getElementById('sv-jsonbin-label');
-  const time = document.getElementById('sv-jsonbin-sync-time');
-  if (!el || !lbl) return;
-  el.className = 'sv-jsonbin-status ' + state;
-  const labels = {
+  const indicators = document.querySelectorAll('.sv-jsonbin-status');
+  const labels = document.querySelectorAll('.sv-jsonbin-label');
+  const times = document.querySelectorAll('.sv-jsonbin-sync-time');
+  const statusLabels = {
     connecting: 'Connecting…',
     connected:  'Connected',
     error:      'Sync Error',
     saving:     'Saving…'
   };
-  lbl.textContent = labels[state] || state;
-  if (time) {
+
+  indicators.forEach(el => {
+    el.classList.remove('connecting', 'connected', 'error', 'saving');
+    el.classList.add(state);
+    el.title = state === 'error' && msg
+      ? 'JSONBin error: ' + msg
+      : 'JSONBin.io cloud sync — last update: ' + fmtTime();
+  });
+
+  labels.forEach(lbl => {
+    lbl.textContent = statusLabels[state] || state;
+  });
+
+  times.forEach(time => {
     if (msg) {
       time.textContent = msg;
       time.style.display = 'inline';
     } else if (state === 'connecting') {
       time.style.display = 'none';
     }
-  }
-  el.title = state === 'error' && msg
-    ? 'JSONBin error: ' + msg
-    : 'JSONBin.io cloud sync — last update: ' + fmtTime();
+  });
 }
 
 /* ══════════════════════════════════════════
@@ -1061,8 +1076,8 @@ const SHOWS = [
   id:0,title:"Breaking Bad",year:"2008–2013",genre:"Crime Drama",rating:"TV-MA",match:"98%",seasons_count:5,isNew:false,
   desc:"A high school chemistry teacher diagnosed with inoperable lung cancer turns to manufacturing methamphetamine alongside a former student to secure his family's future.",
   tags:["Crime","Drama","Dark","Thriller","Award-Winning"],
-  heroImg:"https://image.tmdb.org/t/p/original/tsRy63Mu5cu8etL1X7ZLyf7UP1M.jpg",
-  poster:"https://image.tmdb.org/t/p/w500/ggFHVNu6YYI5L9pCfOacjizRGt.jpg",
+  heroImg:"https://image.tmdb.org/t/p/original/tsRy63Mu5cu8etL1X7ZLyf7UP1M.jpg ",
+  poster:"https://image.tmdb.org/t/p/w500/ggFHVNu6YYI5L9pCfOacjizRGt.jpg ",
   seasons:[
     {season:1,episodes:[
       {ep:1,title:"Pilot",dur:"58m",desc:"Walter White receives a terminal cancer diagnosis and decides to enter the drug trade with his former student Jesse Pinkman.",driveId:"1hHDKLzPdeMUTeuyu6LaHX8y7XPRGbk9o"},
@@ -1094,7 +1109,7 @@ const SHOWS = [
       {ep:3,title:"I.F.T.",dur:"47m",desc:"Skyler takes dramatic steps to force Walt out of the family home; Walt begins cooking for Gus full-time.",driveId:null},
       {ep:4,title:"Green Light",dur:"47m",desc:"Walt discovers Jesse is selling his product without permission, jeopardising their arrangement with Gus.",driveId:null},
       {ep:5,title:"Más",dur:"47m",desc:"Gus shows Walt an extraordinary state-of-the-art superlab beneath a laundry facility.",driveId:null},
-      {ep:6,title:"Sunset",dur:"47m",desc:"Hank tracks down Walt and Jesse's old RV; Walt and Jesse race to destroy evidence before he can search it.",driveId:null},
+      {ep:6,title:"Sunset",dur:"47m",desc:"Walt and Jesse race to destroy evidence before Hank can search the old RV.",driveId:null},
       {ep:7,title:"One Minute",dur:"47m",desc:"Hank brutally assaults Jesse; the two cartel assassins close in on Hank in a shocking, violent confrontation.",driveId:null},
       {ep:8,title:"I See You",dur:"47m",desc:"The White family rallies at the hospital as Hank fights for his life; Walt grows paranoid about Gus's intentions.",driveId:null},
       {ep:9,title:"Kafkaesque",dur:"47m",desc:"Jesse proposes selling Blue Sky through rehab; Skyler begins laundering Walt's drug money through the car wash.",driveId:null},
@@ -1144,8 +1159,8 @@ const SHOWS = [
   id:1,title:"Young Sheldon",year:"2017–2024",genre:"Sitcom",rating:"TV-PG",match:"93%",seasons_count:7,isNew:false,
   desc:"Nine-year-old Sheldon Cooper skips four grades to attend high school in East Texas, navigating a world that is ill-equipped for a child genius — and vice versa.",
   tags:["Family","Comedy","Coming-of-Age","Prequel","Texas"],
-  heroImg:"https://image.tmdb.org/t/p/original/ucsA4hBfwcd2ol5KejgQ5dQC1e3.jpg",
-  poster:"https://image.tmdb.org/t/p/original/kidkbZRBGbsEIrX7pODRSKi9ipl.jpg",
+  heroImg:"https://image.tmdb.org/t/p/original/ucsA4hBfwcd2ol5KejgQ5dQC1e3.jpg ",
+  poster:"https://image.tmdb.org/t/p/original/kidkbZRBGbsEIrX7pODRSKi9ipl.jpg ",
   seasons:[
     {season:1,episodes:[
       {ep:1,title:"Pilot",dur:"22m",desc:"Nine-year-old Sheldon skips four grades and starts attending East Texas Tech High alongside his older brother.",driveId:"1wKYdQpiX4mqQQIrTP8P_oX2aYS6LHZfc"},
@@ -1199,7 +1214,7 @@ const SHOWS = [
       {ep:1,title:"Quirky Eggheads and a Rocky Divorce",dur:"20m",desc:"Sheldon attends college classes for the first time.",driveId:null},{ep:2,title:"A Broom Closet and Satan's Monopoly Board",dur:"20m",desc:"Sheldon finds a private space to think at the university.",driveId:null},{ep:3,title:"An Entrepreneurialist and a Swat on the Bottom",dur:"20m",desc:"Georgie launches a business venture.",driveId:null},{ep:4,title:"Hobbitses, Physicses and a Ball with Zip",dur:"20m",desc:"Sheldon becomes obsessed with The Hobbit.",driveId:null},{ep:5,title:"A Pineapple and the Bosom of Male Friendship",dur:"20m",desc:"George Sr. and Dr. Sturgis develop an unlikely friendship.",driveId:null},{ep:6,title:"A Parasol and a Helium Tank",dur:"20m",desc:"Sheldon discovers parasols as sun protection.",driveId:null},{ep:7,title:"Pongo Pygmaeus and a Culture that Encourages Spitting",dur:"20m",desc:"Sheldon becomes fascinated with primatology.",driveId:null},{ep:8,title:"The Yips and an Oddly Hypnotic Bohemian",dur:"20m",desc:"George Sr. develops performance anxiety.",driveId:null},{ep:9,title:"A Party Invitation, Football Grapes and an Earth Chicken",dur:"20m",desc:"Sheldon receives his first party invitation.",driveId:null},{ep:10,title:"Teenager Soup and a Little Ball of Fib",dur:"20m",desc:"Sheldon is caught in a lie.",driveId:null},{ep:11,title:"A Live Chicken, a Fried Chicken and Holy Matrimony",dur:"20m",desc:"Meemaw makes a surprise announcement about her love life.",driveId:null},{ep:12,title:"Body Glitter and a Mall Safety Kit",dur:"20m",desc:"Missy convinces Sheldon to accompany her to the mall.",driveId:null},{ep:13,title:"Contracts, Rules and a Little Bit of Pig Brains",dur:"20m",desc:"Sheldon attempts to formalise all family relationships with written contracts.",driveId:null},{ep:14,title:"Pasadena",dur:"20m",desc:"Sheldon visits Caltech for the first time.",driveId:null},{ep:15,title:"A Boyfriend's Ex-Wife and a Good Luck Head Rub",dur:"20m",desc:"Mary is unsettled by Dr. Sturgis's ex-wife.",driveId:null},{ep:16,title:"Pasadena Part 2",dur:"20m",desc:"The family adjusts to new dynamics at home following Dr. Sturgis's hospitalisation.",driveId:null},{ep:17,title:"An Academic Dishonesty and the Crazy Meemaw",dur:"20m",desc:"Meemaw's gambling escalates.",driveId:null},{ep:18,title:"A Couple Bruised Ribs and a Cereal Box Ghost Detector",dur:"20m",desc:"George Sr. is injured; Sheldon builds a ghost detector.",driveId:null},{ep:19,title:"A House for Baby and a Hedgehog Using a Crochet Hook",dur:"20m",desc:"The Coopers consider moving to a bigger house.",driveId:null},{ep:20,title:"Peanut Butter Chicken and an Ugly Mural",dur:"20m",desc:"Sheldon tries to appreciate art.",driveId:null},{ep:21,title:"A Secret Letter and a Lowly Pole-Sitter",dur:"22m",desc:"Season 3 finale: A secret letter from a prestigious institution changes things.",driveId:null}
     ]},
     {season:4,episodes:[
-      {ep:1,title:"Graduation",dur:"21m",desc:"Sheldon graduates high school at age 11.",driveId:null},{ep:2,title:"A Docent, a Little Lady and a Bouncer Named Dalton",dur:"20m",desc:"Sheldon starts at East Texas Tech.",driveId:null},{ep:3,title:"Training Wheels and a Tantrum",dur:"20m",desc:"Sheldon struggles with the independence of college life.",driveId:null},{ep:4,title:"Bible Camp and a Chariot of Love",dur:"20m",desc:"Missy attends Bible camp.",driveId:null},{ep:5,title:"A Musty Cot and a Stillborn Condor",dur:"20m",desc:"Sheldon befriends a college student.",driveId:null},{ep:6,title:"An Ugly Car, an Affair and Some Kickass Football",dur:"20m",desc:"George Sr. is distracted by a personal conflict.",driveId:null},{ep:7,title:"A Philosophy Class and Worms That Can Chase You",dur:"20m",desc:"Sheldon takes a philosophy class.",driveId:null},{ep:8,title:"An Existential Crisis and a Bear That Makes Bubbles",dur:"20m",desc:"Sheldon confronts existential questions.",driveId:null},{ep:9,title:"Crappy Frozen Ice Cream and a Puppy Named Bob",dur:"20m",desc:"Missy campaigns for a puppy.",driveId:null},{ep:10,title:"Cowboy Aerobics and a Lasting Friendship",dur:"20m",desc:"George Sr. takes up a new hobby.",driveId:null},{ep:11,title:"A Pager, a Club and a Gosh Darn Pie",dur:"20m",desc:"Sheldon gets a pager.",driveId:null},{ep:12,title:"A Box of Treasure and the Meemaw of Luck",dur:"20m",desc:"Meemaw discovers a box of old letters.",driveId:null},{ep:13,title:"The Reorientation and a Supersonic Thundercrack",dur:"20m",desc:"Sheldon re-evaluates his academic direction.",driveId:null},{ep:14,title:"Mitch's Son and the Unconditional Approval of a Government Agency",dur:"20m",desc:"Georgie starts a new business.",driveId:null},{ep:15,title:"A Baby Tooth and the Egyptian God of Knowledge",dur:"20m",desc:"Sheldon undergoes his first dental procedure.",driveId:null},{ep:16,title:"A Second Bat Mitzvah and the Overly Classifiable Dream",dur:"20m",desc:"Sheldon attends a religious ceremony.",driveId:null},{ep:17,title:"Genes, Genes, the Magical Fruit",dur:"20m",desc:"Sheldon becomes obsessed with genetics.",driveId:null},{ep:18,title:"The Wild and Woolly World of Nonlinear Dynamics",dur:"22m",desc:"Season 4 finale.",driveId:null}
+      {ep:1,title:"Graduation",dur:"21m",desc:"Sheldon graduates high school at age 11.",driveId:null},{ep:2,title:"A Docent, a Little Lady and a Bouncer Named Dalton",dur:"20m",desc:"Sheldon starts at East Texas Tech.",driveId:null},{ep:3,title:"Training Wheels and a Tantrum",dur:"20m",desc:"Sheldon struggles with the independence of college life.",driveId:null},{ep:4,title:"Bible Camp and a Chariot of Love",dur:"20m",desc:"Missy attends Bible camp.",driveId:null},{ep:5,title:"A Musty Cot and a Stillborn Condor",dur:"20m",desc:"Sheldon befriends a college student.",driveId:null},{ep:6,title:"An Ugly Car, an Affair and Some Kickass Football",dur:"20m",desc:"George Sr. is distracted by a personal conflict.",driveId:null},{ep:7,title:"A Philosophy Class and Worms That Can Chase You",dur:"20m",desc:"Sheldon takes a philosophy class.",driveId:null},{ep:8,title:"An Existential Crisis and a Bear That Makes Bubbles",dur:"20m",desc:"Sheldon confronts existential questions.",driveId:null},{ep:9,title:"Crappy Frozen Ice Cream and a Puppy Named Bob",dur:"20m",desc:"Missy campaigns for a puppy.",driveId:null},{ep:10,title:"Cowboy Aerobics and a Lasting Friendship",dur:"20m",desc:"George Sr. takes up a new hobby.",driveId:null},{ep:11,title:"A Pager, a Club, and a Gosh Darn Pie",dur:"20m",desc:"Sheldon gets a pager.",driveId:null},{ep:12,title:"A Box of Treasure and the Meemaw of Luck",dur:"20m",desc:"Meemaw discovers a box of old letters.",driveId:null},{ep:13,title:"The Reorientation and a Supersonic Thundercrack",dur:"20m",desc:"Sheldon re-evaluates his academic direction.",driveId:null},{ep:14,title:"Mitch's Son and the Unconditional Approval of a Government Agency",dur:"20m",desc:"Georgie starts a new business.",driveId:null},{ep:15,title:"A Baby Tooth and the Egyptian God of Knowledge",dur:"20m",desc:"Sheldon undergoes his first dental procedure.",driveId:null},{ep:16,title:"A Second Bat Mitzvah and the Overly Classifiable Dream",dur:"20m",desc:"Sheldon attends a religious ceremony.",driveId:null},{ep:17,title:"Genes, Genes, the Magical Fruit",dur:"20m",desc:"Sheldon becomes obsessed with genetics.",driveId:null},{ep:18,title:"The Wild and Woolly World of Nonlinear Dynamics",dur:"22m",desc:"Season 4 finale.",driveId:null}
     ]},
     {season:5,episodes:[
       {ep:1,title:"One Bad Night and Chaos of Selfish Desires",dur:"20m",desc:"The Cooper family deals with the aftermath of Season 4.",driveId:null},{ep:2,title:"Snoopin' Around and the Wonder Twins of Atheism",dur:"20m",desc:"Sheldon and Missy secretly investigate their parents.",driveId:null},{ep:3,title:"Potential Energy and Hooch on a Park Bench",dur:"20m",desc:"Sheldon learns about potential energy.",driveId:null},{ep:4,title:"Pish Posh and a Little Potty Mouth",dur:"20m",desc:"Missy develops a rebellious streak.",driveId:null},{ep:5,title:"A Live Chicken, a Fried Chicken, and Holy Matrimony",dur:"20m",desc:"A major family announcement triggers different reactions.",driveId:null},{ep:6,title:"Money Laundering and a Cascade of Hormones",dur:"20m",desc:"Georgie's business dealings become more complicated.",driveId:null},{ep:7,title:"An Introduction to Engineering and a Glob of Hair Gel",dur:"20m",desc:"Sheldon takes his first engineering class.",driveId:null},{ep:8,title:"The Grand Chancellor and a Den of Sin",dur:"20m",desc:"Sheldon challenges the university administration.",driveId:null},{ep:9,title:"The Yips and an Oddly Hypnotic Bohemian",dur:"20m",desc:"Sheldon develops presentation anxiety.",driveId:null},{ep:10,title:"Uncle Sheldon and a Hormonal Firecracker",dur:"20m",desc:"Sheldon is surprisingly supportive during a difficult situation.",driveId:null},{ep:11,title:"A Lock-In, a Chip Clip, and a Hairnet",dur:"20m",desc:"The church hosts a youth lock-in.",driveId:null},{ep:12,title:"A Pink Cadillac and a Brilliant Clementine",dur:"20m",desc:"Mary joins a multi-level marketing scheme.",driveId:null},{ep:13,title:"A Lot of Band-Aids and the Cooper Catastrophe",dur:"20m",desc:"A string of bad luck befalls the Cooper family.",driveId:null},{ep:14,title:"A Free Scratcher and Feminine Wiles",dur:"20m",desc:"Missy discovers she can get what she wants.",driveId:null},{ep:15,title:"Teen Angst and a Smart-Boy Dummy",dur:"20m",desc:"Sheldon navigates adolescent emotions.",driveId:null},{ep:16,title:"A Suitcase Full of Cash and a Yellow Foul Line",dur:"20m",desc:"Georgie's business takes a dramatic turn.",driveId:null},{ep:17,title:"A Solo Peanut, a Sadistic Preacher and Paddy Wagons",dur:"20m",desc:"George Sr. confronts a difficult situation at school.",driveId:null},{ep:18,title:"Babies, Lies and a Resplendent Cannoli",dur:"20m",desc:"A surprise pregnancy changes the family dynamic.",driveId:null},{ep:19,title:"A God-Fearin' Motherboard and a Shoutin' Preacher",dur:"20m",desc:"Sheldon upgrades the church's audio-visual system.",driveId:null},{ep:20,title:"Uncle Sheldon and a Hormonal Firecracker Part 2",dur:"20m",desc:"The Cooper siblings face a pivotal moment.",driveId:null},{ep:21,title:"White Trash, Holy Rollers and Punching People",dur:"20m",desc:"The family tensions come to a head.",driveId:null},{ep:22,title:"Graduation",dur:"22m",desc:"Season 5 finale: A major milestone is reached.",driveId:null}
@@ -1218,8 +1233,8 @@ const SHOWS = [
   id:2,title:"The Rookie",year:"2018–Present",genre:"Crime Drama",rating:"TV-14",match:"91%",seasons_count:7,isNew:false,
   desc:"Nathan Fillion stars as John Nolan — at 40, the oldest rookie in the LAPD — using life experience, determination, and surprising competence to navigate police work.",
   tags:["Police Drama","Action","Comedy","Los Angeles","Nathan Fillion"],
-  heroImg:"https://image.tmdb.org/t/p/original/eSbDfC0EwYqSEfCeGzmICCExk05.jpg",
-  poster:"https://image.tmdb.org/t/p/original/70kTz0OmjjZe7zHvIDrq2iKW7PJ.jpg",
+  heroImg:"https://image.tmdb.org/t/p/original/eSbDfC0EwYqSEfCeGzmICCExk05.jpg ",
+  poster:"https://image.tmdb.org/t/p/original/70kTz0OmjjZe7zHvIDrq2iKW7PJ.jpg ",
   seasons:[
     {season:1,episodes:[
       {ep:1,title:"Pilot",dur:"43m",desc:"A mid-life crisis leads John Nolan to join the LAPD.",driveId:"1_qtMk3a17C_hYGk4QkY8mSn0Vmw22fLR"},
@@ -1269,8 +1284,8 @@ const SHOWS = [
   id:3,title:"The Boys",year:"2019–2024",genre:"Superhero Satire",rating:"TV-MA",match:"97%",seasons_count:4,isNew:true,
   desc:"In a world where superheroes are marketed by a powerful corporation, a group of vigilantes known as 'The Boys' set out to expose the truth about the corrupt and murderous heroes.",
   tags:["Superhero","Satire","Action","Dark Comedy","Amazon Original"],
-  heroImg:"https://image.tmdb.org/t/p/original/mGVrXeIjyecj6TKmwPVpHlscEmw.jpg",
-  poster:"https://image.tmdb.org/t/p/w500/stTEycfG9928HYGEISBFaG1ngjM.jpg",
+  heroImg:"https://image.tmdb.org/t/p/original/mGVrXeIjyecj6TKmwPVpHlscEmw.jpg ",
+  poster:"https://image.tmdb.org/t/p/w500/stTEycfG9928HYGEISBFaG1ngjM.jpg ",
   seasons:[
     {season:1,episodes:[
       {ep:1,title:"The Name of the Game",dur:"60m",desc:"Hughie Campbell's life is shattered when a superhero accidentally kills his girlfriend.",driveId:null},

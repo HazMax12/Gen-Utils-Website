@@ -1011,14 +1011,14 @@ h1.art-title{font-size:1.85rem;font-weight:700;line-height:1.3;color:var(--ink);
 <script>
 /* ══════════════════════════════════════════
    JSONBIN.IO CONFIGURATION
-   ══════════════════════════════════════════ */
+══════════════════════════════════════════ */
 const JSONBIN_API_KEY = '$2a$10$SjBg6CrgSUCfwpgaAQydq..btV8lhPyCAT7Xqxb4SRfveUppoTFua';
 const JSONBIN_BIN_ID  = '69f37a82856a6821898f56ec';
 const JSONBIN_URL     = `https://api.jsonbin.io/v3/b/${JSONBIN_BIN_ID}`;
 
 /* ══════════════════════════════════════════
    JSONBIN STATUS UI
-   ══════════════════════════════════════════ */
+══════════════════════════════════════════ */
 function fmtTime() {
   return new Date().toLocaleTimeString([], {hour:'2-digit', minute:'2-digit', second:'2-digit'});
 }
@@ -1042,7 +1042,6 @@ function setJsonbinStatus(state, syncMsg) {
   } else if (time && state === 'connecting') {
     time.style.display = 'none';
   }
-  // Update tooltip with detail on error
   if (state === 'error' && syncMsg) {
     el.title = 'JSONBin sync error: ' + syncMsg;
   } else {
@@ -1052,7 +1051,7 @@ function setJsonbinStatus(state, syncMsg) {
 
 /* ══════════════════════════════════════════
    SHOW DATA — full episode lists
-   ══════════════════════════════════════════ */
+══════════════════════════════════════════ */
 const SHOWS = [
 
 /* ─────────────── BREAKING BAD ─────────────── */
@@ -1089,7 +1088,7 @@ const SHOWS = [
     ]},
     {season:3,episodes:[
       {ep:1,title:"No Más",dur:"47m",desc:"Walt attempts to reconcile with Skyler; two assassins cross the border, hunting Walt on behalf of the cartel.",driveId:null},
-      {ep:2,title:"Caballo Sin Nombre",dur:"47m",desc:"Walt moves back into the house; Jesse discovers his parents have sold his aunt's home out from under him.",driveId:null},
+      {ep:2,title:"Caballo Sin Nombre",dur:"47m",desc:"Walt moves back into the house; Jesse discovers his aunt's home has been sold out from under him.",driveId:null},
       {ep:3,title:"I.F.T.",dur:"47m",desc:"Skyler takes dramatic steps to force Walt out of the family home; Walt begins cooking for Gus full-time.",driveId:null},
       {ep:4,title:"Green Light",dur:"47m",desc:"Walt discovers Jesse is selling his product without permission, jeopardising their arrangement with Gus.",driveId:null},
       {ep:5,title:"Más",dur:"47m",desc:"Gus shows Walt an extraordinary state-of-the-art superlab beneath a laundry facility.",driveId:null},
@@ -1126,7 +1125,7 @@ const SHOWS = [
       {ep:6,title:"Buyout",dur:"47m",desc:"Jesse wants out; Mike negotiates a methylamine deal that would cut Walt out entirely.",driveId:null},
       {ep:7,title:"Say My Name",dur:"47m",desc:"Walt confronts Declan's gang and makes a chilling declaration; Mike's fate is sealed.",driveId:null},
       {ep:8,title:"Gliding Over All",dur:"47m",desc:"Walt's empire reaches its zenith; a fateful trip to the bathroom puts everything at risk.",driveId:null},
-      {ep:9,title:"Blood Money",dur:"47m",desc:"Hank confronts Walt in a garage; Walt's cold threat — 'I am the danger' — escalates to open war.",driveId:null},
+      {ep:9,title:"Blood Money",dur:"47m",desc:"Hank confronts Walt in a garage; Walt's cold threat escalates to open war.",driveId:null},
       {ep:10,title:"Buried",dur:"47m",desc:"Walt buries his money in the desert; Skyler is cornered by Hank and Marie.",driveId:null},
       {ep:11,title:"Confessions",dur:"47m",desc:"Walt creates a false confession video framing Hank; Jesse pieces together the truth about Brock's poisoning.",driveId:null},
       {ep:12,title:"Rabid Dog",dur:"47m",desc:"Jesse attempts to burn down the White house; Hank persuades him to cooperate with the DEA.",driveId:null},
@@ -1338,40 +1337,42 @@ const SHOWS = [
 
 /* ══════════════════════════════════════════
    JSONBIN.IO SYNC ENGINE
-   ══════════════════════════════════════════ */
+══════════════════════════════════════════ */
 let syncInProgress = false;
 let pendingSync = false;
 let lastSyncTime = 0;
 const SYNC_DEBOUNCE = 2000;
 const POLL_INTERVAL = 10000;
 
+// ── FIX: Save ALL episodes (including explicit nulls) so removals are persisted ──
 function showsToDriveData() {
   const data = {};
   SHOWS.forEach(show => {
     data[show.id] = {};
     show.seasons.forEach((season, si) => {
+      data[show.id][si] = {};
       season.episodes.forEach((ep, ei) => {
-        if (ep.driveId) {
-          if (!data[show.id][si]) data[show.id][si] = {};
-          data[show.id][si][ei] = ep.driveId;
-        }
+        data[show.id][si][ei] = ep.driveId || null;
       });
     });
   });
   return data;
 }
 
+// ── FIX: Respect explicit cloud nulls (removals), but skip keys absent from cloud
+//         so old partial data doesn't wipe hardcoded IDs ──
 function applyDriveData(data) {
   if (!data) return false;
   let changed = false;
   SHOWS.forEach(show => {
     if (!data[show.id]) return;
     show.seasons.forEach((season, si) => {
-      if (!data[show.id][si]) return;
+      if (data[show.id][si] === undefined) return;
       season.episodes.forEach((ep, ei) => {
-        const cloudId = data[show.id][si]?.[ei];
-        if (cloudId !== undefined && ep.driveId !== cloudId) {
-          ep.driveId = cloudId || null;
+        if (data[show.id][si][ei] === undefined) return;
+        const cloudId = data[show.id][si][ei] || null;
+        if (ep.driveId !== cloudId) {
+          ep.driveId = cloudId;
           changed = true;
         }
       });
@@ -1481,7 +1482,7 @@ async function initCloudSync() {
 
 /* ══════════════════════════════════════════
    PROGRESS TRACKING — localStorage
-   ══════════════════════════════════════════ */
+══════════════════════════════════════════ */
 const PROGRESS_KEY = 'sv_watch_progress';
 
 function saveProgress(showId, seasonIdx, epIdx) {
@@ -1510,7 +1511,7 @@ function getProgress(showId) {
 
 /* ══════════════════════════════════════════
    UI STATE
-   ══════════════════════════════════════════ */
+══════════════════════════════════════════ */
 let detailId=0, detailSeason=0, playerShowId=0, playerSeason=0, playerEp=0;
 
 /* ──── HERO ──── */
@@ -1720,7 +1721,7 @@ window.svClose = function() {
 
 /* ══════════════════════════════════════════
    DRIVE ID EDITOR
-   ══════════════════════════════════════════ */
+══════════════════════════════════════════ */
 const EDITOR_EMAIL = 'cherryblossom2312@outlook.com';
 let editorAuthed = false;
 let editorActiveShow = 0;
@@ -1926,7 +1927,7 @@ function showSaveToast() {
 
 /* ══════════════════════════════════════════
    KEYBOARD SHORTCUTS
-   ══════════════════════════════════════════ */
+══════════════════════════════════════════ */
 document.addEventListener('keydown', e => {
   if (e.ctrlKey && e.shiftKey && (e.key === 'L' || e.key === 'l')) {
     e.preventDefault();
@@ -1958,7 +1959,7 @@ document.addEventListener('keydown', e => {
 
 /* ══════════════════════════════════════════
    INIT
-   ══════════════════════════════════════════ */
+══════════════════════════════════════════ */
 initCloudSync();
 </script>
 </body>
